@@ -1,0 +1,43 @@
+import type { Metadata } from 'next'
+
+import { CloudFooter } from '@cloud/_components/CloudFooter/index'
+import { CloudHeader } from '@cloud/_components/CloudHeader/index'
+import { fetchGlobals } from '@data'
+import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { featureFlags } from '@root/features'
+import { notFound } from 'next/navigation'
+
+import classes from './layout.module.scss'
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Payload Cloud',
+    template: '%s | Payload Cloud',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: '@payloadcms',
+    description: 'The Node & React TypeScript Headless CMS',
+    title: 'Payload',
+  },
+  // TODO: Add cloud graphic
+  openGraph: mergeOpenGraph(),
+}
+
+export default async (props) => {
+  const { children } = props
+
+  if (!featureFlags.cloud) {
+    notFound()
+  }
+
+  const { topBar } = await fetchGlobals()
+
+  return (
+    <div className={classes.layout}>
+      <CloudHeader topBar={topBar} />
+      <div className={classes.container}>{children}</div>
+      <CloudFooter />
+    </div>
+  )
+}

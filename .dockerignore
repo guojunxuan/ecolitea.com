@@ -1,0 +1,15 @@
+.env*
+!.env.example
+.next
+node_modules
+.git
+.github
+coverage
+out
+*.log
+.DS_Store
+docker-compose.override.yml
+docker-compose.override.yaml
+caddy/data
+caddy/config
+docs

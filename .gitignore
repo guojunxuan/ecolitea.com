@@ -1,0 +1,28 @@
+# Dependencies and generated application output
+node_modules/
+.next/
+out/
+coverage/
+
+# Local environment files; the safe template remains tracked
+.env*
+!.env.example
+
+# Logs and operating-system files
+*.log
+.DS_Store
+
+# Local Docker and Caddy state
+docker-compose.override.yml
+docker-compose.override.yaml
+caddy/data/
+caddy/config/
+
+# Tooling caches and local runtime artifacts
+.playwright-cli/
+.pnpm-store/
+.claude/
+
+# Local media uploads (production media lives in Cloudflare R2)
+# Leading slash anchors to repo root so src/components/Media and src/blocks/Media stay tracked
+/media/
