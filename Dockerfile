@@ -1,4 +1,3 @@
-```dockerfile
 FROM node:20-bookworm-slim AS base
 
 ENV PNPM_HOME=/pnpm
@@ -107,4 +106,3 @@ USER ecolitea
 EXPOSE 3000
 
 CMD ["pnpm", "start"]
-```
