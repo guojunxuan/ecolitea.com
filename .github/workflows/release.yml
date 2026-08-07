@@ -1,5 +1,4 @@
-
-ame: New Release Ecolitea
+name: New Release Ecolitea
 
 on:
   workflow_dispatch:
