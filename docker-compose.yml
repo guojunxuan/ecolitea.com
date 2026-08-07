@@ -1,44 +1,58 @@
+```yaml
 services:
   ecolitea:
-    image: ${ECOLITEA_IMAGE}:${IMAGE_TAG}
+    image: ${ECOLITEA_IMAGE}:${IMAGE_TAG:-latest}
     restart: unless-stopped
+
     environment:
       DATABASE_URI: ${MONGODB_URI}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_CMS_URL: ${NEXT_PUBLIC_CMS_URL}
       PAYLOAD_PUBLIC_APP_URL: ${PAYLOAD_PUBLIC_APP_URL}
       SITEMAP_URL: ${SITEMAP_URL}
+
       NEXT_PRIVATE_DRAFT_SECRET: ${NEXT_PRIVATE_DRAFT_SECRET}
       NEXT_PRIVATE_REVALIDATION_KEY: ${NEXT_PRIVATE_REVALIDATION_KEY}
       REVALIDATION_KEY: ${REVALIDATION_KEY}
+
       NEXT_PUBLIC_ENABLE_CLOUD: ${NEXT_PUBLIC_ENABLE_CLOUD}
       NEXT_PUBLIC_ENABLE_DOCS: ${NEXT_PUBLIC_ENABLE_DOCS}
       NEXT_PUBLIC_ENABLE_COMMUNITY_HELP: ${NEXT_PUBLIC_ENABLE_COMMUNITY_HELP}
       NEXT_PUBLIC_ENABLE_PARTNERS: ${NEXT_PUBLIC_ENABLE_PARTNERS}
       NEXT_PUBLIC_ENABLE_STYLEGUIDE: ${NEXT_PUBLIC_ENABLE_STYLEGUIDE}
+
       NEXT_PUBLIC_SKIP_BUILD_DOCS: ${NEXT_PUBLIC_SKIP_BUILD_DOCS}
       NEXT_PUBLIC_SKIP_BUILD_HELPS: ${NEXT_PUBLIC_SKIP_BUILD_HELPS}
       NEXT_PUBLIC_IS_LIVE: ${NEXT_PUBLIC_IS_LIVE}
+
       GA_USE_DEMO_DATA: ${GA_USE_DEMO_DATA}
+
       R2_BUCKET: ${R2_BUCKET}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
       R2_ENDPOINT: ${R2_ENDPOINT}
       R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+
       SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+
       NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID:-}
       NEXT_PUBLIC_GTM_MEASUREMENT_ID: ${NEXT_PUBLIC_GTM_MEASUREMENT_ID:-}
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${NEXT_PUBLIC_FACEBOOK_PIXEL_ID:-}
+
       NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY:-}
       NEXT_PRIVATE_RECAPTCHA_SECRET_KEY: ${NEXT_PRIVATE_RECAPTCHA_SECRET_KEY:-}
       NEXT_PRIVATE_HUBSPOT_PORTAL_KEY: ${NEXT_PRIVATE_HUBSPOT_PORTAL_KEY:-}
+
       NODE_ENV: production
       PORT: 3000
       HOSTNAME: 0.0.0.0
+
     depends_on:
       mongodb:
         condition: service_healthy
+
     healthcheck:
       test:
         - CMD
@@ -49,52 +63,67 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
     networks:
       - internal
+
 
   mongodb:
     image: mongo:7.0
     restart: unless-stopped
+
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
     volumes:
       - mongodb_data:/data/db
+
     healthcheck:
       test:
         - CMD-SHELL
-        - 'mongosh --quiet --username "$$MONGO_INITDB_ROOT_USERNAME" --password "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand(\"ping\").ok"'
+        - 'mongosh --quiet --username "$$MONGO_INITDB_ROOT_USERNAME" --password "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand({ ping: 1 }).ok"'
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
     networks:
       - internal
+
 
   caddy:
     image: caddy:2.10.2-alpine
     restart: unless-stopped
+
     depends_on:
       ecolitea:
         condition: service_healthy
+
     environment:
       DOMAIN: ${DOMAIN}
+
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
+
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+
     networks:
       - internal
+
 
 volumes:
   mongodb_data:
   caddy_data:
   caddy_config:
 
+
 networks:
   internal:
     driver: bridge
+```
