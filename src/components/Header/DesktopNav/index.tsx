@@ -133,11 +133,13 @@ export const DesktopNav: React.FC<DesktopNavType> = ({ hideBackground, menuCta, 
 
     const itemWidths = measuredItems.map((item) => item.getBoundingClientRect().width)
     const gap = Number.parseFloat(window.getComputedStyle(measurementRow).columnGap) || 0
+    const reservedEndSpace = Number.parseFloat(window.getComputedStyle(navRegion).paddingInlineEnd) || 0
     const nextVisibleCount = getVisibleNavigationCount({
       availableWidth: navRegion.clientWidth,
       gap,
       itemWidths,
       moreWidth: moreItem.getBoundingClientRect().width,
+      reservedEndSpace,
     })
 
     const currentVisibleCount = visibleCountRef.current

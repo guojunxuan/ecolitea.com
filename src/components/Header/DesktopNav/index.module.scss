@@ -89,7 +89,7 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   width: 100%;
   max-width: 1220px;
   margin: 0 auto;
-  grid-template-columns: 19% 66% 15%;
+  grid-template-columns: 19% minmax(0, 1fr) max-content;
 
   :local(a) {
     text-decoration: none;
@@ -101,6 +101,7 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   position: relative;
   width: 100%;
   min-width: 0;
+  padding-inline-end: clamp(1.5rem, 2vw, 2rem);
 }
 
 .authNav {
