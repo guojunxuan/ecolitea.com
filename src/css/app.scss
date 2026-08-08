@@ -1,11 +1,11 @@
-@use './github.scss' as *;
-@use './grid.scss' as *;
-@use './vars.scss' as *;
-@use './queries.scss' as *;
-@use './type.scss' as *;
-@use './colors.scss';
-@use './theme.scss';
-@use './toasts.scss';
+@use "./github.scss" as *;
+@use "./grid.scss" as *;
+@use "./vars.scss" as *;
+@use "./queries.scss" as *;
+@use "./type.scss" as *;
+@use "./colors.scss";
+@use "./theme.scss";
+@use "./toasts.scss";
 
 :root {
   font-size: 20px;
@@ -25,7 +25,8 @@
   --scrollbar-width: 17px;
   --sticky-sidebar-top: calc(var(--header-height) + 1.25rem);
   --header-height: 90px;
-  --top-bar-height: 3rem;
+  --top-bar-expanded-height: 3rem;
+  --top-bar-height: var(--top-bar-expanded-height);
   --page-padding-top: calc(var(--header-height) + var(--top-bar-height));
 
   --font-body-size: 18px;
@@ -64,7 +65,8 @@
   }
 
   @include mobile-header-break {
-    --header-height: 66px;
+    --header-height: 60px;
+    --top-bar-expanded-height: 30px;
   }
 
   @include mid-break {
@@ -101,12 +103,12 @@ html {
     scroll-behavior: smooth;
   }
 
-  &[data-theme='dark'],
-  &[data-theme='light'] {
+  &[data-theme="dark"],
+  &[data-theme="light"] {
     opacity: initial;
   }
 
-  &[data-theme='dark'] {
+  &[data-theme="dark"] {
     background: var(--color-base-1000);
     color-scheme: dark;
   }
@@ -122,7 +124,7 @@ body {
   width: 100vw;
   overflow-x: hidden;
 
-  &:has([data-modal='open']) {
+  &:has([data-modal="open"]) {
     overflow: hidden;
   }
 }
@@ -246,13 +248,13 @@ code {
     padding: 2px 4px;
   }
 
-  @include data-theme-selector('light') {
+  @include data-theme-selector("light") {
     background: var(--theme-elevation-50);
     border: 1px solid var(--theme-elevation-200);
     box-shadow: 0px 1px 2px -1px var(--theme-elevation-250);
   }
 
-  @include data-theme-selector('dark') {
+  @include data-theme-selector("dark") {
     background: var(--theme-elevation-150);
     border: 1px solid var(--theme-elevation-200);
   }
@@ -304,19 +306,23 @@ dialog {
 }
 
 .hero .background-grid div {
-  background: linear-gradient(to bottom, transparent 0px, var(--theme-border-color) 8vh);
+  background: linear-gradient(
+    to bottom,
+    transparent 0px,
+    var(--theme-border-color) 8vh
+  );
 }
 
 .background-scanline {
-  background-image: url('/images/scanline-dark.png');
+  background-image: url("/images/scanline-dark.png");
   background-repeat: repeat;
   opacity: 0.08;
   transition:
     transform 0.3s ease-in-out,
     opacity 0.3s ease-in-out;
 
-  [data-theme='dark'] & {
-    background-image: url('/images/scanline-light.png');
+  [data-theme="dark"] & {
+    background-image: url("/images/scanline-light.png");
   }
 }
 
