@@ -25,7 +25,7 @@
   --scrollbar-width: 17px;
   --sticky-sidebar-top: calc(var(--header-height) + 1.25rem);
   --header-height: 90px;
-  --top-bar-expanded-height: 3rem;
+  --top-bar-expanded-height: 34px;
   --top-bar-height: var(--top-bar-expanded-height);
   --page-padding-top: calc(var(--header-height) + var(--top-bar-height));
 
@@ -61,7 +61,6 @@
     --gutter-h: 4rem;
     --block-spacing: 5rem;
     --new-block-spacing: 6rem;
-    --header-height: 76px;
   }
 
   @include mobile-header-break {

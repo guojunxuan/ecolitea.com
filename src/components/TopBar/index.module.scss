@@ -1,8 +1,8 @@
 @use "@scss/common" as *;
 
 .topBar {
-  height: 3rem;
-  padding: 0.75rem var(--gutter-h);
+  height: var(--top-bar-expanded-height);
+  padding: 0 var(--gutter-h);
   width: 100%;
   background-color: var(--theme-success-100);
   border-bottom: 1px solid var(--theme-success-150);
@@ -15,53 +15,45 @@
   text-decoration: none;
 
   .desktopContent {
-    display: contents;
-  }
-
-  .ticker {
     display: none;
   }
 
+  .ticker {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .tickerTrack {
+    align-items: center;
+    animation: ticker 18s linear infinite;
+    display: flex;
+    height: 100%;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .tickerItem {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    padding-right: 2rem;
+    white-space: nowrap;
+  }
+
   * {
-    line-height: 1.5rem;
+    line-height: var(--top-bar-expanded-height);
     text-align: left;
   }
 
   @include mobile-header-break {
-    height: 30px;
+    height: var(--top-bar-expanded-height);
     padding: 0;
     display: block;
     overflow: hidden;
     @include small;
-
-    .desktopContent {
-      display: none;
-    }
-
-    .ticker {
-      display: block;
-      height: 100%;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .tickerTrack {
-      align-items: center;
-      animation: ticker 18s linear infinite;
-      display: flex;
-      height: 100%;
-      width: max-content;
-      will-change: transform;
-    }
-
-    .tickerItem {
-      align-items: center;
-      display: flex;
-      flex: 0 0 auto;
-      gap: 0.75rem;
-      padding-right: 2rem;
-      white-space: nowrap;
-    }
 
     .message {
       flex-grow: 0;
