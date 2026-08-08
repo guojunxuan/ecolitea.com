@@ -9,9 +9,7 @@ export const dynamic = 'force-static'
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const { isEnabled: draft } = await draftMode()
-  const getGlobals = draft
-    ? fetchGlobals
-    : unstable_cache(fetchGlobals, ['globals', 'mainMenu', 'footer'])
+  const getGlobals = draft ? fetchGlobals : unstable_cache(fetchGlobals, ['globals', 'mainMenu', 'footer'])
 
   const { footer, mainMenu, topBar } = await getGlobals()
 
@@ -20,7 +18,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <Header {...mainMenu} topBar={topBar} />
       <div>
         {children}
-        <div id="docsearch" />
         <Footer {...footer} />
       </div>
     </React.Fragment>

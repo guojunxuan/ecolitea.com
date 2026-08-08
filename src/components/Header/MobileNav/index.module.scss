@@ -92,10 +92,11 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   }
 }
 
-.searchToggler {
-  all: unset;
+.searchButton {
+  @include btnReset;
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  margin-right: 0.5rem;
 }
 
 .modalToggler {

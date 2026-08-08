@@ -5,13 +5,7 @@ import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-import {
-  BlocksFeature,
-  EXPERIMENTAL_TableFeature,
-  lexicalEditor,
-  LinkFeature,
-  UploadFeature,
-} from '@payloadcms/richtext-lexical'
+import { EXPERIMENTAL_TableFeature, lexicalEditor, LinkFeature, UploadFeature } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import link from '@root/fields/link'
 import { LabelFeature } from '@root/fields/richText/features/label/server'
@@ -56,23 +50,6 @@ import { StickyHighlights } from './blocks/StickyHighlights'
 import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
 import { CommunityHelp } from './collections/CommunityHelp'
-import { Docs } from './collections/Docs'
-import { ArrowBlock } from './collections/Docs/blocks/arrow'
-import { BannerBlock } from './collections/Docs/blocks/banner'
-import { BulletListBlock } from './collections/Docs/blocks/bulletList'
-import { CardBlock } from './collections/Docs/blocks/card'
-import { CardGroupBlock } from './collections/Docs/blocks/cardGroup'
-import { CodeBlock } from './collections/Docs/blocks/code'
-import { LightDarkImageBlock } from './collections/Docs/blocks/lightDarkImage'
-import { PayloadMediaBlock } from './collections/Docs/blocks/payloadMedia'
-import { PillBlock } from './collections/Docs/blocks/pill'
-import { ResourceBlock } from './collections/Docs/blocks/resource'
-import { RestExamplesBlock } from './collections/Docs/blocks/restExamples'
-import { TableWithDrawersBlock } from './collections/Docs/blocks/tableWithDrawers'
-import { UploadBlock } from './collections/Docs/blocks/upload'
-import { VideoDrawerBlock } from './collections/Docs/blocks/VideoDrawer'
-import { YoutubeBlock } from './collections/Docs/blocks/youtube'
-import { DocsFeedback } from './collections/DocsFeedback'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Budgets, Industries, Regions, Specialties } from './collections/PartnerFilters'
@@ -90,7 +67,6 @@ import { featureFlags } from './features'
 import createReleasePost from './scripts/createReleasePost'
 import createReleasePostFromAdmin from './scripts/createReleasePostFromAdmin'
 import redeployWebsite from './scripts/redeployWebsite'
-import { refreshMdxToLexical, syncDocs } from './scripts/syncDocs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -136,19 +112,9 @@ export default buildConfig({
     Callout,
     CallToAction,
     DownloadBlock,
-    LightDarkImageBlock,
-    PayloadMediaBlock,
-    TableWithDrawersBlock,
-    YoutubeBlock,
-    PillBlock,
-    ArrowBlock,
-    BulletListBlock,
-    CardBlock,
-    CardGroupBlock,
     CardGrid,
     CaseStudyCards,
     CaseStudiesHighlight,
-    UploadBlock,
     CaseStudyParallax,
     CodeFeature,
     Content,
@@ -162,10 +128,8 @@ export default buildConfig({
     MediaBlock,
     MediaContent,
     MediaContentAccordion,
-    RestExamplesBlock,
     Pricing,
     ReusableContentBlock,
-    ResourceBlock,
     Slider,
     Statement,
     Steps,
@@ -225,7 +189,6 @@ export default buildConfig({
 
       interfaceName: 'BrBlock',
     },
-    VideoDrawerBlock,
     {
       slug: 'commandLine',
       fields: [
@@ -258,56 +221,11 @@ export default buildConfig({
         singular: 'Link',
       },
     },
-    {
-      slug: 'templateCards',
-      fields: [
-        {
-          name: 'templates',
-          type: 'array',
-          fields: [
-            {
-              name: 'name',
-              type: 'text',
-              required: true,
-            },
-            {
-              name: 'description',
-              type: 'textarea',
-              required: true,
-            },
-            {
-              name: 'image',
-              type: 'text',
-              required: true,
-            },
-            {
-              name: 'slug',
-              type: 'text',
-              required: true,
-            },
-            {
-              name: 'order',
-              type: 'number',
-              required: true,
-            },
-          ],
-          labels: {
-            plural: 'Templates',
-            singular: 'Template',
-          },
-        },
-      ],
-      interfaceName: 'TemplateCardsBlock',
-    },
-    BannerBlock,
-    CodeBlock,
     Code,
   ],
   collections: [
     CaseStudies,
     CommunityHelp,
-    Docs,
-    DocsFeedback,
     Media,
     Pages,
     Posts,
@@ -320,11 +238,7 @@ export default buildConfig({
     Regions,
     Budgets,
   ],
-  cors: [
-    process.env.PAYLOAD_PUBLIC_APP_URL || '',
-    'https://payloadcms.com',
-    'https://discord.com/api',
-  ].filter(Boolean),
+  cors: [process.env.PAYLOAD_PUBLIC_APP_URL || '', 'https://payloadcms.com', 'https://discord.com/api'].filter(Boolean),
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
@@ -374,19 +288,6 @@ export default buildConfig({
       }),
       LabelFeature(),
       LargeBodyFeature(),
-      BlocksFeature({
-        blocks: [
-          'spotlight',
-          'video',
-          'br',
-          'Banner',
-          'VideoDrawer',
-          'templateCards',
-          'Code',
-          'downloadBlock',
-          'commandLine',
-        ],
-      }),
     ],
   }),
   email: nodemailerAdapter({
@@ -395,20 +296,6 @@ export default buildConfig({
     ...sendgridConfig,
   }),
   endpoints: [
-    ...(featureFlags.docs
-      ? [
-          {
-            handler: syncDocs,
-            method: 'get' as const,
-            path: '/sync/docs',
-          },
-          {
-            handler: refreshMdxToLexical,
-            method: 'get' as const,
-            path: '/refresh/mdx-to-lexical',
-          },
-        ]
-      : []),
     {
       handler: redeployWebsite,
       method: 'post',
@@ -524,9 +411,7 @@ export default buildConfig({
                 const portalID = process.env.NEXT_PRIVATE_HUBSPOT_PORTAL_KEY
 
                 // Remove partnerId from HubSpot submission (toEmail already populated by beforeChange hook)
-                const submissionData = submissionDataFromDoc.filter(
-                  (field) => field.field !== 'partnerId',
-                )
+                const submissionData = submissionDataFromDoc.filter((field) => field.field !== 'partnerId')
 
                 const data = {
                   context: {
@@ -567,9 +452,7 @@ export default buildConfig({
             async ({ data, req }) => {
               // Look up partner email if partnerId is present and populate toEmail field
               // This runs before email notifications are sent
-              const partnerIdField = data?.submissionData?.find(
-                (field) => field.field === 'partnerId',
-              )
+              const partnerIdField = data?.submissionData?.find((field) => field.field === 'partnerId')
 
               if (partnerIdField?.value) {
                 try {

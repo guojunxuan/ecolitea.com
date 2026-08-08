@@ -156,10 +156,7 @@ export const fetchBlogPosts = async (): Promise<Partial<Post>[]> => {
     },
     sort: '-publishedOn',
     where: {
-      and: [
-        { publishedOn: { less_than_equal: currentDate } },
-        { _status: { equals: 'published' } },
-      ],
+      and: [{ publishedOn: { less_than_equal: currentDate } }, { _status: { equals: 'published' } }],
     },
   })
   return data.docs
@@ -177,10 +174,7 @@ export const fetchArchive = async (slug: string, draft?: boolean): Promise<Parti
       posts: {
         sort: '-publishedOn',
         where: {
-          and: [
-            { publishedOn: { less_than_equal: currentDate } },
-            { _status: { equals: 'published' } },
-          ],
+          and: [{ publishedOn: { less_than_equal: currentDate } }, { _status: { equals: 'published' } }],
         },
       },
     },
@@ -338,24 +332,6 @@ export const fetchCommunityHelp = async (slug: string): Promise<CommunityHelp> =
   })
 
   return data.docs[0]
-}
-
-export const fetchRelatedThreads = async (path: string): Promise<Partial<CommunityHelp>[]> => {
-  const payload = await getPayload({ config })
-
-  const data = await payload.find({
-    collection: 'community-help',
-    depth: 0,
-    limit: 3,
-    select: {
-      slug: true,
-      communityHelpType: true,
-      title: true,
-    },
-    where: { 'relatedDocs.path': { equals: path } },
-  })
-
-  return data.docs
 }
 
 export const fetchPartners = async (): Promise<Partner[]> => {

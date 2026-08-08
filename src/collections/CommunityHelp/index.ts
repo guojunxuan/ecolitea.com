@@ -102,10 +102,7 @@ export const CommunityHelp: CollectionConfig = {
         afterChange: [
           async ({ previousValue, siblingData, value }) => {
             if (previousValue !== value) {
-              const docID =
-                siblingData.communityHelpType === 'discord'
-                  ? siblingData.discordID
-                  : siblingData.githubID
+              const docID = siblingData.communityHelpType === 'discord' ? siblingData.discordID : siblingData.githubID
               if (docID) {
                 await updateAlgolia(docID, value)
               }
@@ -113,16 +110,6 @@ export const CommunityHelp: CollectionConfig = {
           },
         ],
       },
-    },
-    {
-      name: 'relatedDocs',
-      type: 'relationship',
-      admin: {
-        position: 'sidebar',
-      },
-      hasMany: true,
-      index: true,
-      relationTo: 'docs',
     },
     {
       name: 'threadCreatedAt',
