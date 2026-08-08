@@ -101,12 +101,12 @@ export const DesktopNav: React.FC<DesktopNavType> = ({ hideBackground, menuCta, 
     >
       <Gutter className={[classes.desktopNav, activeDropdown && classes.active].filter(Boolean).join(' ')}>
         <div className={[classes.grid, 'grid'].join(' ')}>
-          <div className={[classes.logo, 'cols-4'].join(' ')}>
+          <div className={[classes.logo, 'cols-3'].join(' ')}>
             <Link aria-label="Full Payload Logo" className={classes.logo} href="/" prefetch={false}>
               <FullLogo className="w-auto h-[30px]" />
             </Link>
           </div>
-          <div className={[classes.content, 'cols-8'].join(' ')}>
+          <div className={[classes.content, 'cols-10'].join(' ')}>
             <div className={classes.tabs} onMouseLeave={resetHoverStyles}>
               {(tabs || []).map((tab, tabIndex) => {
                 const { enableDirectLink = false, enableDropdown = false } = tab
@@ -230,7 +230,7 @@ export const DesktopNav: React.FC<DesktopNavType> = ({ hideBackground, menuCta, 
               </div>
             </div>
           </div>
-          <div className={'cols-4'}>
+          <div className={'cols-3'}>
             <div className={[classes.secondaryNavItems, classes.show].join(' ')}>
               {menuCta && menuCta.label && <CMSLink {...menuCta} className={classes.button} />}
               <button aria-label="Search site" className={classes.searchButton} type="button">
