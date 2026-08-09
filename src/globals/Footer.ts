@@ -1,72 +1,72 @@
-import type { ArrayFieldValidation, GlobalConfig } from 'payload'
+import type { ArrayFieldValidation, GlobalConfig } from "payload";
 
-import { validations } from 'payload'
+import { validations } from "payload";
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from "next/cache";
 
-import { isAdmin } from '../access/isAdmin'
-import link from '../fields/link'
+import { isAdmin } from "../access/isAdmin";
+import link from "../fields/link";
 import {
   footerSocialPlatformOptions,
   validateFooterSocialURL,
   validateUniqueSocialPlatforms,
-} from './footerSocials.js'
+} from "./footerSocials.js";
 
 const validateSocialLinks: ArrayFieldValidation = async (value, options) => {
-  const arrayValidationResult = await validations.array(value, options)
+  const arrayValidationResult = await validations.array(value, options);
 
-  if (arrayValidationResult !== true) return arrayValidationResult
+  if (arrayValidationResult !== true) return arrayValidationResult;
 
-  return validateUniqueSocialPlatforms(value)
-}
+  return validateUniqueSocialPlatforms(value);
+};
 
 export const Footer: GlobalConfig = {
-  slug: 'footer',
+  slug: "footer",
   access: {
     read: () => true,
     update: isAdmin,
   },
   fields: [
     {
-      name: 'brand',
-      type: 'group',
+      name: "brand",
+      type: "group",
       fields: [
         {
-          name: 'logo',
-          type: 'upload',
-          relationTo: 'media',
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
           required: true,
         },
         {
-          name: 'logoAlt',
-          type: 'text',
+          name: "logoAlt",
+          type: "text",
           required: true,
         },
         {
-          name: 'tagline',
-          type: 'textarea',
+          name: "tagline",
+          type: "textarea",
           required: true,
         },
       ],
     },
     {
-      name: 'socialLinks',
-      type: 'array',
+      name: "socialLinks",
+      type: "array",
       admin: {
         components: {
-          RowLabel: '@root/globals/CustomRowLabelSocialLinks',
+          RowLabel: "@root/globals/CustomRowLabelSocialLinks",
         },
       },
       fields: [
         {
-          name: 'platform',
-          type: 'select',
+          name: "platform",
+          type: "select",
           options: footerSocialPlatformOptions,
           required: true,
         },
         {
-          name: 'url',
-          type: 'text',
+          name: "url",
+          type: "text",
           required: true,
           validate: validateFooterSocialURL,
         },
@@ -75,22 +75,22 @@ export const Footer: GlobalConfig = {
       validate: validateSocialLinks,
     },
     {
-      name: 'columns',
-      type: 'array',
+      name: "columns",
+      type: "array",
       admin: {
         components: {
-          RowLabel: '@root/globals/CustomRowLabelFooterColumns',
+          RowLabel: "@root/globals/CustomRowLabelFooterColumns",
         },
       },
       fields: [
         {
-          name: 'label',
-          type: 'text',
+          name: "label",
+          type: "text",
           required: true,
         },
         {
-          name: 'navItems',
-          type: 'array',
+          name: "navItems",
+          type: "array",
           fields: [
             link({
               appearances: false,
@@ -102,56 +102,56 @@ export const Footer: GlobalConfig = {
       minRows: 1,
     },
     {
-      name: 'newsletter',
-      type: 'group',
+      name: "newsletter",
+      type: "group",
       fields: [
         {
-          name: 'heading',
-          type: 'text',
+          name: "heading",
+          type: "text",
           required: true,
         },
         {
-          name: 'description',
-          type: 'textarea',
+          name: "description",
+          type: "textarea",
           required: true,
         },
         {
-          name: 'emailPlaceholder',
-          type: 'text',
+          name: "emailPlaceholder",
+          type: "text",
           required: true,
         },
       ],
     },
     {
-      name: 'contact',
-      type: 'group',
+      name: "contact",
+      type: "group",
       fields: [
         {
-          name: 'address',
-          type: 'textarea',
+          name: "address",
+          type: "textarea",
         },
         {
-          name: 'phone',
-          type: 'text',
+          name: "phone",
+          type: "text",
         },
         {
-          name: 'email',
-          type: 'email',
+          name: "email",
+          type: "email",
         },
       ],
     },
     {
-      name: 'companyName',
-      type: 'text',
+      name: "companyName",
+      type: "text",
       required: true,
     },
     {
-      name: 'copyrightText',
-      type: 'text',
+      name: "copyrightText",
+      type: "text",
       required: true,
     },
   ],
   hooks: {
-    afterChange: [() => revalidatePath('/', 'layout')],
+    afterChange: [() => revalidatePath("/", "layout")],
   },
-}
+};

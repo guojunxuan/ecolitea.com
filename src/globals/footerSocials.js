@@ -1,37 +1,39 @@
 export const footerSocialPlatformLabels = {
-  facebook: 'Facebook',
-  instagram: 'Instagram',
-  youtube: 'YouTube',
-  linkedin: 'LinkedIn',
-  x: 'X',
-  tiktok: 'TikTok',
-}
+  facebook: "Facebook",
+  instagram: "Instagram",
+  youtube: "YouTube",
+  linkedin: "LinkedIn",
+  x: "X",
+  tiktok: "TikTok",
+};
 
-export const footerSocialPlatformOptions = Object.entries(footerSocialPlatformLabels).map(([value, label]) => ({
+export const footerSocialPlatformOptions = Object.entries(
+  footerSocialPlatformLabels,
+).map(([value, label]) => ({
   label,
   value,
-}))
+}));
 
 export const getFooterSocialPlatformLabel = (platform) =>
   platform && Object.hasOwn(footerSocialPlatformLabels, platform)
     ? footerSocialPlatformLabels[platform]
-    : 'Social link'
+    : "Social link";
 
 export const validateFooterSocialURL = (value) => {
-  if (!value) return 'URL is required.'
+  if (!value) return "URL is required.";
 
   try {
-    return new URL(value).protocol === 'https:' ? true : 'Use an HTTPS URL.'
+    return new URL(value).protocol === "https:" ? true : "Use an HTTPS URL.";
   } catch {
-    return 'Enter a valid URL.'
+    return "Enter a valid URL.";
   }
-}
+};
 
 export const validateUniqueSocialPlatforms = (value) => {
-  if (!Array.isArray(value)) return true
+  if (!Array.isArray(value)) return true;
 
-  const platforms = value.map((row) => row?.platform).filter(Boolean)
+  const platforms = value.map((row) => row?.platform).filter(Boolean);
   return new Set(platforms).size === platforms.length
     ? true
-    : 'Each social platform can only be added once.'
-}
+    : "Each social platform can only be added once.";
+};
