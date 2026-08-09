@@ -30,6 +30,7 @@ test('provides the exact labels for supported footer social platforms', () => {
 test('accepts undefined and unique social platform arrays', () => {
   assert.equal(validateUniqueSocialPlatforms(undefined), true)
   assert.equal(validateUniqueSocialPlatforms([{ platform: 'facebook' }, { platform: 'instagram' }]), true)
+  assert.equal(validateUniqueSocialPlatforms([null, { platform: 'facebook' }]), true)
 })
 
 test('rejects duplicate social platforms', () => {

@@ -25,7 +25,7 @@ export const validateFooterSocialURL = (value) => {
 export const validateUniqueSocialPlatforms = (value) => {
   if (!Array.isArray(value)) return true
 
-  const platforms = value.map(({ platform }) => platform).filter(Boolean)
+  const platforms = value.map((row) => row?.platform).filter(Boolean)
   return new Set(platforms).size === platforms.length
     ? true
     : 'Each social platform can only be added once.'
