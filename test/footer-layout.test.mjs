@@ -53,6 +53,12 @@ test("renders only the desktop navigation tree by default", () => {
   assert.match(mobileNavigation, /display:\s*none\s*;/);
 });
 
+test("wraps long desktop navigation headings within their grid tracks", () => {
+  const navigationHeading = getBlock(stylesheet, ".navigationHeading");
+
+  assert.match(navigationHeading, /overflow-wrap:\s*anywhere\s*;/);
+});
+
 test("hands navigation and content layout to mobile at the shared header breakpoint", () => {
   const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
   const mobileContent = getBlock(mobileBreakpoint, ".content");
@@ -84,10 +90,36 @@ test("caps the desktop newsletter control and lets it fill the mobile column", (
   assert.match(mobileSubscribePlaceholder, /width:\s*100%\s*;/);
 });
 
-test("keeps the copyright rule as the footer content sole divider", () => {
+test("lets long mobile navigation labels wrap without moving the arrow", () => {
+  const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
+  const navigationTrigger = getBlock(mobileBreakpoint, ".navigationTrigger");
+  const navigationLabel = getBlock(navigationTrigger, "> span:first-child");
+
+  assert.match(navigationLabel, /min-width:\s*0\s*;/);
+  assert.match(navigationLabel, /overflow-wrap:\s*anywhere\s*;/);
+});
+
+test("places the horizontal content divider on the copyright row", () => {
   const copyright = getBlock(stylesheet, ".copyright");
 
   assert.match(copyright, /border-top:\s*1px\s+solid\s+[^;]+;/);
+});
+
+test("wraps long copyright text within the footer container", () => {
+  const copyright = getBlock(stylesheet, ".copyright");
+  const copyrightParagraph = getBlock(copyright, "p");
+
+  assert.match(copyrightParagraph, /overflow-wrap:\s*anywhere\s*;/);
+});
+
+test("gives mobile contact anchors a minimum touch target", () => {
+  const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
+  const mobileContact = getBlock(mobileBreakpoint, ".contact");
+  const mobileContactAnchor = getBlock(mobileContact, "a");
+
+  assert.match(mobileContactAnchor, /display:\s*flex\s*;/);
+  assert.match(mobileContactAnchor, /min-height:\s*44px\s*;/);
+  assert.match(mobileContactAnchor, /align-items:\s*center\s*;/);
 });
 
 test("removes legacy decorative footer selectors", () => {

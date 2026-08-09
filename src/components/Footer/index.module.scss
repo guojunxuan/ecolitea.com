@@ -128,6 +128,7 @@ $footer-muted: var(--color-base-300);
   line-height: 1.25;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .navigationLinks {
@@ -276,6 +277,7 @@ $footer-muted: var(--color-base-300);
 
   p {
     margin: 0;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -336,6 +338,11 @@ $footer-muted: var(--color-base-300);
       outline-offset: 2px;
     }
 
+    > span:first-child {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     &[aria-expanded="true"] .navigationArrow {
       transform: rotate(225deg);
     }
@@ -387,6 +394,12 @@ $footer-muted: var(--color-base-300);
 
   .contact {
     margin-top: 28px;
+
+    a {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+    }
   }
 
   .copyright {
