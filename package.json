@@ -7,6 +7,7 @@
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "test:footer-schema": "tsx --test test/footer-schema.test.ts",
     "build": "pnpm payload migrate && cross-env NODE_OPTIONS=--no-deprecation next build",
     "build:skipDocs": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "postbuild": "next-sitemap --config ./next-sitemap.config.cjs",
@@ -86,6 +87,7 @@
     "dotenv": "^16.4.7",
     "eslint": "9.22.0",
     "prettier": "3.4.2",
+    "tsx": "4.20.6",
     "typescript": "5.7.3"
   },
   "pnpm": {

@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   footerSocialPlatformLabels,
   footerSocialPlatformOptions,
+  getFooterSocialPlatformLabel,
   validateFooterSocialURL,
   validateUniqueSocialPlatforms,
 } from '../src/globals/footerSocials.js'
@@ -25,6 +26,9 @@ test('provides the exact labels for supported footer social platforms', () => {
     { label: 'X', value: 'x' },
     { label: 'TikTok', value: 'tiktok' },
   ])
+  assert.equal(getFooterSocialPlatformLabel('facebook'), 'Facebook')
+  assert.equal(getFooterSocialPlatformLabel('toString'), 'Social link')
+  assert.equal(getFooterSocialPlatformLabel(undefined), 'Social link')
 })
 
 test('accepts undefined and unique social platform arrays', () => {

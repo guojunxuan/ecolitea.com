@@ -12,6 +12,11 @@ export const footerSocialPlatformOptions = Object.entries(footerSocialPlatformLa
   value,
 }))
 
+export const getFooterSocialPlatformLabel = (platform) =>
+  platform && Object.hasOwn(footerSocialPlatformLabels, platform)
+    ? footerSocialPlatformLabels[platform]
+    : 'Social link'
+
 export const validateFooterSocialURL = (value) => {
   if (!value) return 'URL is required.'
 
