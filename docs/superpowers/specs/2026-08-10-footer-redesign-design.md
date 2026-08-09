@@ -219,6 +219,19 @@ Implementation requires:
 
 The existing uncommitted semicolon-only changes in `src/payload-types.ts` must not be mixed into the feature accidentally. The implementation must first establish a clean generated baseline or isolate intentional generated output in the feature commit.
 
+## Existing Footer Data Rollout
+
+The current Footer Global document predates the new required brand, newsletter, company, and copyright fields. The schema commit must not be released as a standalone deploy that assumes those values already exist.
+
+The rollout order is:
+
+1. Complete the schema and guarded frontend implementation on the same branch.
+2. Start that complete branch locally and open the existing Footer Global in Payload Admin.
+3. Populate every new required field through the visible Admin form and save it.
+4. Reload Admin and the frontend to confirm persistence before treating the branch as release-ready.
+
+Frontend rendering must retain runtime guards for absent legacy values during this transition. Manual Admin population is the intentional backfill; no seed, Local API, direct HTTP mutation, or MongoDB write is permitted.
+
 ## Accessibility and Interaction
 
 - Footer logo has meaningful alternative text.

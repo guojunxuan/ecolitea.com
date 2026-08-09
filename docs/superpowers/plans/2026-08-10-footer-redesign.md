@@ -994,6 +994,8 @@ Through their visible Admin forms, create at least one valid, renderable record 
 
 - [ ] **Step 5: Manually populate the Footer Global and other relevant Globals**
 
+This Admin save is the required manual backfill for the pre-existing Footer document. Do not treat the branch as release-ready before it succeeds. The frontend implementation must keep runtime guards for the legacy interval in which the new required fields are still absent.
+
 In `/admin/globals/footer`, fill every new Footer module: dark-background logo and alt text, tagline, all six ordered social platforms, four navigation groups with working links, newsletter placeholder copy, address, phone, email, company name, and copyright text. Save using the Admin button, reload, and confirm order/value persistence. Do not overwrite unrelated Main Menu or Top Bar content unless a missing safe link is required for rendering verification.
 
 - [ ] **Step 6: Verify frontend rendering from saved CMS content**
@@ -1022,6 +1024,7 @@ Provide a final matrix listing every visible Collection, QA record identifier, s
 - [ ] Only one divider exists between content and copyright.
 - [ ] Legacy Payload/Cloud/Footer decoration code is removed.
 - [ ] Generated import map and Payload types match the schema.
+- [ ] The legacy Footer document was manually backfilled before release readiness; new frontend fields remain runtime-guarded.
 - [ ] Every visible CMS Collection has been exercised through Payload Admin forms without code/API/database injection.
 - [ ] Required QA images were generated locally and entered into Media only through the Admin upload UI.
 - [ ] QA records are clearly labeled, persisted, and verified on applicable frontend routes.
