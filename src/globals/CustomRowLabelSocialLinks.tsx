@@ -8,9 +8,15 @@ import React from 'react'
 import { footerSocialPlatformLabels } from './footerSocials.js'
 
 const CustomRowLabelSocialLinks: PayloadClientReactComponent<RowLabelComponent> = () => {
-  const { data } = useRowLabel<{ platform?: keyof typeof footerSocialPlatformLabels }>()
+  const { data } = useRowLabel<{ platform?: string }>()
 
-  return data.platform ? footerSocialPlatformLabels[data.platform] : 'Social link'
+  const platform = data?.platform
+
+  if (!platform || !(platform in footerSocialPlatformLabels)) return 'Social link'
+
+  return (
+    footerSocialPlatformLabels[platform as keyof typeof footerSocialPlatformLabels] ?? 'Social link'
+  )
 }
 
 export default CustomRowLabelSocialLinks

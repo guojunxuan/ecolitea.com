@@ -1,4 +1,6 @@
-import type { GlobalConfig } from 'payload'
+import type { ArrayFieldValidation, GlobalConfig } from 'payload'
+
+import { validations } from 'payload'
 
 import { revalidatePath } from 'next/cache'
 
@@ -9,6 +11,14 @@ import {
   validateFooterSocialURL,
   validateUniqueSocialPlatforms,
 } from './footerSocials.js'
+
+const validateSocialLinks: ArrayFieldValidation = async (value, options) => {
+  const arrayValidationResult = await validations.array(value, options)
+
+  if (arrayValidationResult !== true) return arrayValidationResult
+
+  return validateUniqueSocialPlatforms(value)
+}
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -62,7 +72,7 @@ export const Footer: GlobalConfig = {
         },
       ],
       maxRows: 6,
-      validate: validateUniqueSocialPlatforms,
+      validate: validateSocialLinks,
     },
     {
       name: 'columns',
