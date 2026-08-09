@@ -970,79 +970,41 @@ git commit -m "fix: address footer verification findings"
 
 If no corrections were needed, do not create an empty commit.
 
-## Task 7: Populate every Footer module with local verification content
+## Task 7: Populate and verify every CMS Collection through Payload Admin UI
 
-**Files:**
+**Code files:** None. This task must not add seed scripts, call Payload Local API, issue direct HTTP mutations, or write to MongoDB. All content mutations must originate from visible Payload Admin forms.
 
-- Create: `src/scripts/footerVerificationData.js`
-- Create: `src/scripts/seedFooterVerification.ts`
-- Create: `src/scripts/fixtures/ecolitea-footer-verification.svg`
-- Create: `test/footer-verification-data.test.mjs`
-- Modify: `package.json`
+- [ ] **Step 1: Inventory the actual Admin navigation**
 
-- [ ] **Step 1: Write a failing completeness test for the verification content**
+With the branch service running on port 3001, sign in to `/admin` and record every visible Collection, including plugin-provided Collections such as Forms, Form Submissions, and Redirects when present. Reconcile the visible list with `payload.config.ts`; the Admin UI is the final authority for this test.
 
-The test must require one populated brand, six unique social platforms, four non-empty navigation groups, newsletter placeholder copy, address/phone/email, company name, and copyright text. Every navigation row must contain a renderable custom link with a label and local URL.
+- [ ] **Step 2: Define safe manual test-data rules**
 
-Run:
+Use the prefix `[CMS STABILITY QA]` in titles/names so records are identifiable. Create new records instead of overwriting existing records wherever the Collection permits. Use `example.test` email addresses, never real customer addresses; do not enable email delivery, publish external integrations, delete existing records, or alter production credentials. For relationship fields, select only QA records created in this run or existing public records that are safe to reference.
 
-```bash
-node --test test/footer-verification-data.test.mjs
-```
+- [ ] **Step 3: Manually populate prerequisite Collections first**
 
-Expected: FAIL because `src/scripts/footerVerificationData.js` does not exist.
+Through the Admin UI, create/save representative records in dependency order: Media, Categories/filter taxonomies, Users, Reusable Content, Forms, and any other relationship targets shown by the actual schemas. Upload media through the visible file picker. For each Collection, return to its list view and confirm the record is present after refresh.
 
-- [ ] **Step 2: Implement the pure verification data builder**
+- [ ] **Step 4: Manually populate content Collections**
 
-Export `buildFooterVerificationData({ logo })` from `src/scripts/footerVerificationData.js`. Use representative ECOLITEA content and these four groups: `Products`, `Solutions`, `Resources`, and `Company`. Use stable local routes such as `/`, `/partners`, `/community-help`, `/privacy`, and `/styleguide`; do not depend on deleted `/docs` or `/cloud` routes. Include all six supported social platforms with valid HTTPS URLs.
+Through their visible Admin forms, create at least one valid, renderable record in every remaining Collection, including Pages, Posts, Case Studies, Community Help, Partners, Redirects, and plugin Collections that permit manual creation. Exercise each major field module exposed by that Collection at least once: required metadata, relationships, media, rich-text/content blocks, status/draft controls, and links. Do not use developer console scripts or network request replay.
 
-- [ ] **Step 3: Add an idempotent local-only Payload seed script**
+- [ ] **Step 5: Manually populate the Footer Global and other relevant Globals**
 
-`seedFooterVerification.ts` must:
+In `/admin/globals/footer`, fill every new Footer module: dark-background logo and alt text, tagline, all six ordered social platforms, four navigation groups with working links, newsletter placeholder copy, address, phone, email, company name, and copyright text. Save using the Admin button, reload, and confirm order/value persistence. Do not overwrite unrelated Main Menu or Top Bar content unless a missing safe link is required for rendering verification.
 
-- refuse to run when `NODE_ENV === 'production'`;
-- initialize Payload from the project config;
-- read the current `footer` Global and save a timestamped JSON snapshot under `os.tmpdir()` before updating it;
-- find the verification logo by filename, creating it from `src/scripts/fixtures/ecolitea-footer-verification.svg` only when absent;
-- update only the `footer` Global through Payload Local API with `overrideAccess: true`;
-- print the backup path, media ID, Footer Global ID, and counts for navigation/social rows;
-- be idempotent: a second run must reuse the same media record and produce the same Footer field values;
-- never update Pages, Posts, Main Menu, Top Bar, Users, or other Collections/Globals.
+- [ ] **Step 6: Verify frontend rendering from saved CMS content**
 
-Add this package script:
+Open the frontend routes created or referenced by the QA records and verify they render without server/client errors. For Footer specifically, test at 1440px, 1171px, 1170px, and 390px: four desktop groups remain in one row, mobile navigation is single-open, six social icons follow CMS order, contact protocols are correct, year is automatic, and Newsletter causes no request.
 
-```json
-"seed:footer-verification": "payload run ./src/scripts/seedFooterVerification.ts"
-```
+- [ ] **Step 7: Verify persistence and system stability**
 
-- [ ] **Step 4: Run automated checks**
+Refresh the Admin and frontend repeatedly, reopen every QA record, and verify saved values, relationships, media, ordering, and draft/published state persist. Watch the browser console, network panel, and service terminal for Payload validation errors, React hydration errors, 5xx responses, or repeated requests. Record any Collection that cannot be created manually and the exact visible validation/blocker rather than bypassing it with code.
 
-```bash
-node --test test/footer-verification-data.test.mjs
-pnpm exec tsc --noEmit
-git diff --check
-```
+- [ ] **Step 8: Report the manual test matrix**
 
-Expected: all pass.
-
-- [ ] **Step 5: Commit the repeatable verification content tooling**
-
-```bash
-git add src/scripts/footerVerificationData.js src/scripts/seedFooterVerification.ts src/scripts/fixtures/ecolitea-footer-verification.svg test/footer-verification-data.test.mjs package.json
-git commit -m "test: add footer verification content seed"
-```
-
-- [ ] **Step 6: Populate the local CMS after the Footer schema is active**
-
-```bash
-pnpm seed:footer-verification
-```
-
-Expected: the script succeeds, reports a backup path, and writes all Footer modules. Run it a second time and confirm it reuses the same verification media ID without creating duplicates.
-
-- [ ] **Step 7: Verify real CMS rendering and stability**
-
-With the service on port 3001, verify at 1440px, 1171px, 1170px, and 390px that every seeded module renders, four desktop navigation groups stay in one row, the mobile accordion is single-open, all six social icons render in CMS order, contact links use the correct protocols, the year is generated at runtime, and the newsletter produces no network request. Refresh repeatedly and edit/save one Footer label in admin to confirm Global revalidation remains stable.
+Provide a final matrix listing every visible Collection, QA record identifier, save result, frontend route/render result, and any warning. Include the Footer Global separately with desktop/mobile results. Test data remains in the local CMS for user inspection; do not delete it unless explicitly requested.
 
 ## Final self-review checklist
 
@@ -1058,6 +1020,7 @@ With the service on port 3001, verify at 1440px, 1171px, 1170px, and 390px that 
 - [ ] Only one divider exists between content and copyright.
 - [ ] Legacy Payload/Cloud/Footer decoration code is removed.
 - [ ] Generated import map and Payload types match the schema.
-- [ ] A local-only, idempotent seed populates every Footer module and saves a recoverable pre-update snapshot.
-- [ ] Real CMS content has been rendered and checked across the desktop/mobile boundary.
+- [ ] Every visible CMS Collection has been exercised through Payload Admin forms without code/API/database injection.
+- [ ] QA records are clearly labeled, persisted, and verified on applicable frontend routes.
+- [ ] Footer content has been manually populated and checked across the desktop/mobile boundary.
 - [ ] Existing unrelated `.superpowers/` and `tsconfig.tsbuildinfo` are not committed.
