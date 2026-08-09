@@ -970,6 +970,80 @@ git commit -m "fix: address footer verification findings"
 
 If no corrections were needed, do not create an empty commit.
 
+## Task 7: Populate every Footer module with local verification content
+
+**Files:**
+
+- Create: `src/scripts/footerVerificationData.js`
+- Create: `src/scripts/seedFooterVerification.ts`
+- Create: `src/scripts/fixtures/ecolitea-footer-verification.svg`
+- Create: `test/footer-verification-data.test.mjs`
+- Modify: `package.json`
+
+- [ ] **Step 1: Write a failing completeness test for the verification content**
+
+The test must require one populated brand, six unique social platforms, four non-empty navigation groups, newsletter placeholder copy, address/phone/email, company name, and copyright text. Every navigation row must contain a renderable custom link with a label and local URL.
+
+Run:
+
+```bash
+node --test test/footer-verification-data.test.mjs
+```
+
+Expected: FAIL because `src/scripts/footerVerificationData.js` does not exist.
+
+- [ ] **Step 2: Implement the pure verification data builder**
+
+Export `buildFooterVerificationData({ logo })` from `src/scripts/footerVerificationData.js`. Use representative ECOLITEA content and these four groups: `Products`, `Solutions`, `Resources`, and `Company`. Use stable local routes such as `/`, `/partners`, `/community-help`, `/privacy`, and `/styleguide`; do not depend on deleted `/docs` or `/cloud` routes. Include all six supported social platforms with valid HTTPS URLs.
+
+- [ ] **Step 3: Add an idempotent local-only Payload seed script**
+
+`seedFooterVerification.ts` must:
+
+- refuse to run when `NODE_ENV === 'production'`;
+- initialize Payload from the project config;
+- read the current `footer` Global and save a timestamped JSON snapshot under `os.tmpdir()` before updating it;
+- find the verification logo by filename, creating it from `src/scripts/fixtures/ecolitea-footer-verification.svg` only when absent;
+- update only the `footer` Global through Payload Local API with `overrideAccess: true`;
+- print the backup path, media ID, Footer Global ID, and counts for navigation/social rows;
+- be idempotent: a second run must reuse the same media record and produce the same Footer field values;
+- never update Pages, Posts, Main Menu, Top Bar, Users, or other Collections/Globals.
+
+Add this package script:
+
+```json
+"seed:footer-verification": "payload run ./src/scripts/seedFooterVerification.ts"
+```
+
+- [ ] **Step 4: Run automated checks**
+
+```bash
+node --test test/footer-verification-data.test.mjs
+pnpm exec tsc --noEmit
+git diff --check
+```
+
+Expected: all pass.
+
+- [ ] **Step 5: Commit the repeatable verification content tooling**
+
+```bash
+git add src/scripts/footerVerificationData.js src/scripts/seedFooterVerification.ts src/scripts/fixtures/ecolitea-footer-verification.svg test/footer-verification-data.test.mjs package.json
+git commit -m "test: add footer verification content seed"
+```
+
+- [ ] **Step 6: Populate the local CMS after the Footer schema is active**
+
+```bash
+pnpm seed:footer-verification
+```
+
+Expected: the script succeeds, reports a backup path, and writes all Footer modules. Run it a second time and confirm it reuses the same verification media ID without creating duplicates.
+
+- [ ] **Step 7: Verify real CMS rendering and stability**
+
+With the service on port 3001, verify at 1440px, 1171px, 1170px, and 390px that every seeded module renders, four desktop navigation groups stay in one row, the mobile accordion is single-open, all six social icons render in CMS order, contact links use the correct protocols, the year is generated at runtime, and the newsletter produces no network request. Refresh repeatedly and edit/save one Footer label in admin to confirm Global revalidation remains stable.
+
 ## Final self-review checklist
 
 - [ ] Existing `footer` Global is extended; no new Global or fetch path exists.
@@ -984,4 +1058,6 @@ If no corrections were needed, do not create an empty commit.
 - [ ] Only one divider exists between content and copyright.
 - [ ] Legacy Payload/Cloud/Footer decoration code is removed.
 - [ ] Generated import map and Payload types match the schema.
+- [ ] A local-only, idempotent seed populates every Footer module and saves a recoverable pre-update snapshot.
+- [ ] Real CMS content has been rendered and checked across the desktop/mobile boundary.
 - [ ] Existing unrelated `.superpowers/` and `tsconfig.tsbuildinfo` are not committed.
