@@ -8,7 +8,15 @@ import { Media } from '@components/Media/index'
 import { getFooterSocialPlatformLabel } from '@root/globals/footerSocials.js'
 import React, { useId, useState } from 'react'
 
-import { getFooterCopyright, getFooterEmailHref, getFooterPhoneHref } from './content.js'
+import {
+  getFooterCopyright,
+  getFooterEmailHref,
+  getFooterLogoResource,
+  getFooterPhoneHref,
+  getSafeFooterLink,
+  isSafeFooterSocialURL,
+  normalizeFooterRows,
+} from './content.js'
 import { getNextFooterAccordionItem } from './navigation.js'
 import { footerSocialIcons } from './socialIcons'
 
@@ -16,6 +24,9 @@ import classes from './index.module.scss'
 
 const hasFooterSocialIcon = (platform: unknown): platform is keyof typeof footerSocialIcons =>
   typeof platform === 'string' && Object.prototype.hasOwnProperty.call(footerSocialIcons, platform)
+
+const isFooterRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
 
 export const Footer: React.FC<FooterType> = (props) => {
   const {
@@ -27,11 +38,12 @@ export const Footer: React.FC<FooterType> = (props) => {
     newsletter,
     socialLinks: socialLinksFromProps,
   } = props
-  const columns = columnsFromProps ?? []
-  const socialLinks = socialLinksFromProps ?? []
+  const columns = normalizeFooterRows(columnsFromProps)
+  const socialLinks = normalizeFooterRows(socialLinksFromProps)
   const [openColumnID, setOpenColumnID] = useState<null | string>(null)
   const accordionID = useId()
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getUTCFullYear()
+  const logoResource = getFooterLogoResource(brand?.logo, brand?.logoAlt)
   const phoneHref = getFooterPhoneHref(contact?.phone)
   const emailHref = getFooterEmailHref(contact?.email)
 
@@ -41,8 +53,12 @@ export const Footer: React.FC<FooterType> = (props) => {
         <div className={classes.container}>
           <div className={classes.content}>
             <section className={classes.brand}>
-              {brand?.logo && typeof brand.logo !== 'string' ? (
-                <Media alt={brand.logoAlt || ''} className={classes.logo} resource={brand.logo} />
+              {logoResource ? (
+                <Media
+                  alt={brand?.logoAlt || ''}
+                  className={classes.logo}
+                  resource={logoResource}
+                />
               ) : null}
 
               {typeof brand?.tagline === 'string' && brand.tagline.trim() ? (
@@ -50,19 +66,26 @@ export const Footer: React.FC<FooterType> = (props) => {
               ) : null}
 
               <ul aria-label="Social media" className={classes.socialLinks}>
-                {socialLinks.map(({ id, platform, url }, index) => {
-                  if (!hasFooterSocialIcon(platform) || typeof url !== 'string' || !url.trim()) {
+                {socialLinks.map((socialLink, index) => {
+                  if (!isFooterRecord(socialLink)) return null
+
+                  const { id, platform, url } = socialLink
+                  if (
+                    !hasFooterSocialIcon(platform) ||
+                    typeof url !== 'string' ||
+                    !isSafeFooterSocialURL(url)
+                  ) {
                     return null
                   }
 
                   const Icon = footerSocialIcons[platform]
 
                   return (
-                    <li key={id || `${platform}-${index}`}>
+                    <li key={(typeof id === 'string' && id) || `${platform}-${index}`}>
                       <a
                         aria-label={getFooterSocialPlatformLabel(platform)}
                         className={classes.socialLink}
-                        href={url}
+                        href={url.trim()}
                         rel="noopener noreferrer"
                         target="_blank"
                       >
@@ -85,55 +108,98 @@ export const Footer: React.FC<FooterType> = (props) => {
                   } as React.CSSProperties
                 }
               >
-                {columns.map((column, columnIndex) => (
-                  <section
-                    className={classes.navigationGroup}
-                    key={column.id || `desktop-column-${columnIndex}`}
-                  >
-                    <h2 className={classes.navigationHeading}>{column.label}</h2>
-                    <div className={classes.navigationLinks}>
-                      {column.navItems?.map(({ id, link }, linkIndex) => (
-                        <CMSLink
-                          className={classes.navigationLink}
-                          key={id || `${link.label || 'link'}-${linkIndex}`}
-                          {...link}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
+                {columns.map((column, columnIndex) => {
+                  if (!isFooterRecord(column)) return null
+
+                  const { id, label, navItems: navItemsFromColumn } = column
+                  if (typeof label !== 'string' || !label.trim()) return null
+
+                  const navItems = normalizeFooterRows(navItemsFromColumn)
+                  const columnKey =
+                    (typeof id === 'string' && id) || `desktop-column-${columnIndex}`
+
+                  return (
+                    <section className={classes.navigationGroup} key={columnKey}>
+                      <h2 className={classes.navigationHeading}>{label}</h2>
+                      <div className={classes.navigationLinks}>
+                        {navItems.map((navItem, linkIndex) => {
+                          if (!isFooterRecord(navItem)) return null
+
+                          const safeLink = getSafeFooterLink(navItem.link, 'desktop')
+                          if (!safeLink) return null
+
+                          const navItemID = navItem.id
+                          const linkLabel = safeLink.label
+
+                          return (
+                            <CMSLink
+                              {...safeLink}
+                              className={classes.navigationLink}
+                              key={
+                                (typeof navItemID === 'string' && navItemID) ||
+                                `${typeof linkLabel === 'string' ? linkLabel : 'link'}-${linkIndex}`
+                              }
+                            />
+                          )
+                        })}
+                      </div>
+                    </section>
+                  )
+                })}
               </div>
 
               <div className={classes.mobileNavigation}>
                 {columns.map((column, columnIndex) => {
-                  const columnID = column.id || `${accordionID}-column-${columnIndex}`
+                  if (!isFooterRecord(column)) return null
+
+                  const { id, label, navItems: navItemsFromColumn } = column
+                  if (typeof label !== 'string' || !label.trim()) return null
+
+                  const navItems = normalizeFooterRows(navItemsFromColumn)
+                  const columnID =
+                    (typeof id === 'string' && id) || `${accordionID}-column-${columnIndex}`
                   const panelID = `${accordionID}-panel-${columnIndex}`
                   const isOpen = openColumnID === columnID
 
                   return (
                     <div className={classes.navigationGroup} key={columnID}>
-                      <button
-                        aria-controls={panelID}
-                        aria-expanded={isOpen}
-                        className={classes.navigationTrigger}
-                        onClick={() =>
-                          setOpenColumnID((current) =>
-                            getNextFooterAccordionItem(current, columnID),
-                          )
-                        }
-                        type="button"
-                      >
-                        <span>{column.label}</span>
-                        <span aria-hidden="true" className={classes.navigationArrow} />
-                      </button>
+                      <h2 className={classes.mobileNavigationHeading}>
+                        <button
+                          aria-controls={panelID}
+                          aria-expanded={isOpen}
+                          className={classes.navigationTrigger}
+                          onClick={() =>
+                            setOpenColumnID((current) =>
+                              getNextFooterAccordionItem(current, columnID),
+                            )
+                          }
+                          type="button"
+                        >
+                          <span>{label}</span>
+                          <span aria-hidden="true" className={classes.navigationArrow} />
+                        </button>
+                      </h2>
                       <div className={classes.navigationPanel} hidden={!isOpen} id={panelID}>
-                        {column.navItems?.map(({ id, link }, linkIndex) => (
-                          <CMSLink
-                            className={classes.navigationLink}
-                            key={id || `${link.label || 'link'}-${linkIndex}`}
-                            {...link}
-                          />
-                        ))}
+                        {navItems.map((navItem, linkIndex) => {
+                          if (!isFooterRecord(navItem)) return null
+
+                          const safeLink = getSafeFooterLink(navItem.link, 'mobile')
+                          if (!safeLink) return null
+
+                          const navItemID = navItem.id
+                          const linkLabel = safeLink.label
+
+                          return (
+                            <CMSLink
+                              {...safeLink}
+                              className={classes.navigationLink}
+                              key={
+                                (typeof navItemID === 'string' && navItemID) ||
+                                `${typeof linkLabel === 'string' ? linkLabel : 'link'}-${linkIndex}`
+                              }
+                            />
+                          )
+                        })}
                       </div>
                     </div>
                   )
@@ -171,7 +237,9 @@ export const Footer: React.FC<FooterType> = (props) => {
           </div>
 
           <div className={classes.copyright}>
-            <p>{getFooterCopyright(currentYear, companyName, copyrightText)}</p>
+            <p suppressHydrationWarning>
+              {getFooterCopyright(currentYear, companyName, copyrightText)}
+            </p>
           </div>
         </div>
       </Gutter>
