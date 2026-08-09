@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import * as React from 'react'
 
 import { footerSocialIcons } from '../src/components/Footer/socialIcons'
 
-test('footer social icons include the supported platforms in display order', () => {
+test('footer social icons include the exact supported platform keys', () => {
   assert.deepEqual(Object.keys(footerSocialIcons), [
     'facebook',
     'instagram',
@@ -14,8 +15,8 @@ test('footer social icons include the supported platforms in display order', () 
   ])
 })
 
-test('every footer social icon is a React component function', () => {
+test('every footer social icon is React-renderable', () => {
   for (const icon of Object.values(footerSocialIcons)) {
-    assert.equal(typeof icon, 'function')
+    assert.ok(React.isValidElement(React.createElement(icon)))
   }
 })
