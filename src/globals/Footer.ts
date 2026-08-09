@@ -4,6 +4,11 @@ import { revalidatePath } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
 import link from '../fields/link'
+import {
+  footerSocialPlatformOptions,
+  validateFooterSocialURL,
+  validateUniqueSocialPlatforms,
+} from './footerSocials.js'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -13,8 +18,60 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
+      name: 'brand',
+      type: 'group',
+      fields: [
+        {
+          name: 'logo',
+          type: 'upload',
+          relationTo: 'media',
+          required: true,
+        },
+        {
+          name: 'logoAlt',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'tagline',
+          type: 'textarea',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'socialLinks',
+      type: 'array',
+      admin: {
+        components: {
+          RowLabel: '@root/globals/CustomRowLabelSocialLinks',
+        },
+      },
+      fields: [
+        {
+          name: 'platform',
+          type: 'select',
+          options: footerSocialPlatformOptions,
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
+          required: true,
+          validate: validateFooterSocialURL,
+        },
+      ],
+      maxRows: 6,
+      validate: validateUniqueSocialPlatforms,
+    },
+    {
       name: 'columns',
       type: 'array',
+      admin: {
+        components: {
+          RowLabel: '@root/globals/CustomRowLabelFooterColumns',
+        },
+      },
       fields: [
         {
           name: 'label',
@@ -31,8 +88,57 @@ export const Footer: GlobalConfig = {
           ],
         },
       ],
-      maxRows: 3,
+      maxRows: 4,
       minRows: 1,
+    },
+    {
+      name: 'newsletter',
+      type: 'group',
+      fields: [
+        {
+          name: 'heading',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          required: true,
+        },
+        {
+          name: 'emailPlaceholder',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'contact',
+      type: 'group',
+      fields: [
+        {
+          name: 'address',
+          type: 'textarea',
+        },
+        {
+          name: 'phone',
+          type: 'text',
+        },
+        {
+          name: 'email',
+          type: 'email',
+        },
+      ],
+    },
+    {
+      name: 'companyName',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'copyrightText',
+      type: 'text',
+      required: true,
     },
   ],
   hooks: {

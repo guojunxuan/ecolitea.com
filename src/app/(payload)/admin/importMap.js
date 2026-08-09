@@ -29,6 +29,8 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { default as default_5f152a13cbe40213d87483ad1e348c74 } from '@root/globals/CustomRowLabelSocialLinks'
+import { default as default_f5b60b7270776cb52ae33e706b1de1f6 } from '@root/globals/CustomRowLabelFooterColumns'
 import { default as default_7855b44454994335ecfbd19f80d2bb90 } from '@root/globals/CustomRowLabelNavItems'
 import { default as default_7b4b356d4f495796f5ea32368107862c } from '@root/globals/CustomRowLabelTabs'
 import { BlogMarkdownField as BlogMarkdownField_a0e4da4b38919785352cf36efa721675 } from '@root/blocks/BlogMarkdown/Field'
@@ -68,6 +70,8 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "@root/globals/CustomRowLabelSocialLinks#default": default_5f152a13cbe40213d87483ad1e348c74,
+  "@root/globals/CustomRowLabelFooterColumns#default": default_f5b60b7270776cb52ae33e706b1de1f6,
   "@root/globals/CustomRowLabelNavItems#default": default_7855b44454994335ecfbd19f80d2bb90,
   "@root/globals/CustomRowLabelTabs#default": default_7b4b356d4f495796f5ea32368107862c,
   "@root/blocks/BlogMarkdown/Field#BlogMarkdownField": BlogMarkdownField_a0e4da4b38919785352cf36efa721675,
