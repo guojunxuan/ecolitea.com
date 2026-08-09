@@ -984,7 +984,9 @@ Use the prefix `[CMS STABILITY QA]` in titles/names so records are identifiable.
 
 - [ ] **Step 3: Manually populate prerequisite Collections first**
 
-Through the Admin UI, create/save representative records in dependency order: Media, Categories/filter taxonomies, Users, Reusable Content, Forms, and any other relationship targets shown by the actual schemas. Upload media through the visible file picker. For each Collection, return to its list view and confirm the record is present after refresh.
+Generate a cohesive set of clearly non-production ECOLITEA QA raster assets when the schemas require images (for example hero landscape, product/detail image, partner/case-study image, and neutral test avatar). Save the generated source files locally for inspection, then upload them only through the visible Payload Admin file picker—never through an API or filesystem injection into Payload storage.
+
+Through the Admin UI, create/save representative records in dependency order: Media, Categories/filter taxonomies, Users, Reusable Content, Forms, and any other relationship targets shown by the actual schemas. For each Collection, return to its list view and confirm the record is present after refresh.
 
 - [ ] **Step 4: Manually populate content Collections**
 
@@ -1021,6 +1023,7 @@ Provide a final matrix listing every visible Collection, QA record identifier, s
 - [ ] Legacy Payload/Cloud/Footer decoration code is removed.
 - [ ] Generated import map and Payload types match the schema.
 - [ ] Every visible CMS Collection has been exercised through Payload Admin forms without code/API/database injection.
+- [ ] Required QA images were generated locally and entered into Media only through the Admin upload UI.
 - [ ] QA records are clearly labeled, persisted, and verified on applicable frontend routes.
 - [ ] Footer content has been manually populated and checked across the desktop/mobile boundary.
 - [ ] Existing unrelated `.superpowers/` and `tsconfig.tsbuildinfo` are not committed.
