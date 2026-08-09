@@ -109,6 +109,112 @@ test('accepts valid reference footer links', () => {
   })
 })
 
+test('accepts only renderable reference targets with safe paths', () => {
+  const references = [
+    {
+      label: 'About',
+      reference: {
+        relationTo: 'pages',
+        value: {
+          breadcrumbs: [{ url: '/' }, { url: '/about' }],
+          slug: 'about',
+        },
+      },
+      type: 'reference',
+    },
+    {
+      label: 'News',
+      reference: { relationTo: 'posts', value: { slug: '公司_news-2026' } },
+      type: 'reference',
+    },
+    {
+      label: 'Case study',
+      reference: { relationTo: 'case-studies', value: { slug: 'tea-growth_2026' } },
+      type: 'reference',
+    },
+  ]
+
+  for (const link of references) {
+    assert.deepEqual(getSafeFooterLink(link, 'desktop'), link)
+  }
+})
+
+test('rejects unknown or disguised reference relations', () => {
+  for (const relationTo of [
+    'unknown',
+    'posts\\unsafe',
+    'posts/unsafe',
+    'posts\u0000',
+    'https:posts',
+    'data:posts',
+  ]) {
+    assert.equal(
+      getSafeFooterLink(
+        {
+          label: 'Unsafe reference',
+          reference: { relationTo, value: { slug: 'safe-slug' } },
+          type: 'reference',
+        },
+        'desktop',
+      ),
+      null,
+    )
+  }
+})
+
+test('rejects unsafe page breadcrumb URLs', () => {
+  for (const url of [
+    'javascript:alert(1)',
+    'data:text/html,unsafe',
+    '//example.test/about',
+    'https://',
+    'not a path',
+    '',
+  ]) {
+    assert.equal(
+      getSafeFooterLink(
+        {
+          label: 'Unsafe page',
+          reference: {
+            relationTo: 'pages',
+            value: { breadcrumbs: [{ url }], slug: 'safe-fallback-must-not-win' },
+          },
+          type: 'reference',
+        },
+        'desktop',
+      ),
+      null,
+    )
+  }
+})
+
+test('rejects unpopulated references and unsafe fallback slugs', () => {
+  for (const relationTo of ['pages', 'posts', 'case-studies']) {
+    for (const value of [
+      'relationship-id',
+      {},
+      { slug: '' },
+      { slug: 'unsafe/path' },
+      { slug: 'unsafe\\path' },
+      { slug: 'https:trick' },
+      { slug: 'data:trick' },
+      { slug: 'control\u0000value' },
+    ]) {
+      assert.equal(
+        getSafeFooterLink(
+          {
+            label: 'Unsafe reference',
+            reference: { relationTo, value },
+            type: 'reference',
+          },
+          'mobile',
+        ),
+        null,
+      )
+    }
+  }
+})
+
 test('rejects unsafe or malformed footer links', () => {
   for (const link of [
     null,

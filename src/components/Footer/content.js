@@ -88,6 +88,46 @@ const isSafeFooterCustomURL = (value) => {
   }
 }
 
+const footerReferenceRelations = {
+  'case-studies': true,
+  pages: true,
+  posts: true,
+}
+
+const isSafeFooterSlug = (value) => typeof value === 'string' && /^[\p{L}\p{N}_-]+$/u.test(value)
+
+const isSafeFooterReference = (reference) => {
+  if (!isObjectRecord(reference)) return false
+
+  const relationTo = getOwn(reference, 'relationTo')
+  const value = getOwn(reference, 'value')
+  if (
+    typeof relationTo !== 'string' ||
+    !hasOwn(footerReferenceRelations, relationTo) ||
+    !isObjectRecord(value)
+  ) {
+    return false
+  }
+
+  if (relationTo === 'pages') {
+    const breadcrumbs = getOwn(value, 'breadcrumbs')
+
+    try {
+      if (Array.isArray(breadcrumbs) && breadcrumbs.length > 0) {
+        const finalBreadcrumb = breadcrumbs[breadcrumbs.length - 1]
+
+        return (
+          isObjectRecord(finalBreadcrumb) && isSafeFooterCustomURL(getOwn(finalBreadcrumb, 'url'))
+        )
+      }
+    } catch {
+      return false
+    }
+  }
+
+  return isSafeFooterSlug(getOwn(value, 'slug'))
+}
+
 export const getSafeFooterLink = (link, view) => {
   if (!isObjectRecord(link) || (view !== 'desktop' && view !== 'mobile')) return null
 
@@ -100,17 +140,7 @@ export const getSafeFooterLink = (link, view) => {
 
   if (type === 'reference') {
     const reference = getOwn(link, 'reference')
-    if (!isObjectRecord(reference)) return null
-
-    const relationTo = getOwn(reference, 'relationTo')
-    const value = getOwn(reference, 'value')
-    if (
-      typeof relationTo !== 'string' ||
-      !relationTo.trim() ||
-      (!isObjectRecord(value) && !(typeof value === 'string' && value.trim()))
-    ) {
-      return null
-    }
+    if (!isSafeFooterReference(reference)) return null
   } else if ((type === 'custom' || type === undefined) && !isSafeFooterCustomURL(url)) {
     return null
   } else if (type !== 'custom' && type !== undefined) {
