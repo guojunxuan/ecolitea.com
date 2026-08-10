@@ -32,4 +32,5 @@ test("footer contact items omit empty or unusable contact values", () => {
     [],
   );
   assert.deepEqual(getFooterContactItems(undefined), []);
+  assert.deepEqual(getFooterContactItems(null), []);
 });

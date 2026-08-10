@@ -22,7 +22,7 @@ const getTrimmedContactValue = (value: unknown) =>
   typeof value === "string" ? value.trim() : "";
 
 export const getFooterContactItems = (
-  contact: Footer["contact"],
+  contact: Footer["contact"] | null,
 ): FooterContactItem[] => {
   const address = getTrimmedContactValue(contact?.address);
   const phone = getTrimmedContactValue(contact?.phone);
