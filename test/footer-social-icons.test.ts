@@ -5,21 +5,65 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { footerSocialIcons } from "../src/components/Footer/socialIcons";
 
+const supportedPlatforms = [
+  "facebook",
+  "instagram",
+  "youtube",
+  "linkedin",
+  "x",
+  "tiktok",
+] as const satisfies readonly (keyof typeof footerSocialIcons)[];
+
+const approvedMarkupByPlatform = {
+  facebook: [
+    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<path d="M13.5 21v-8h2.75l.41-3H13.5V8.08c0-.87.24-1.46 1.58-1.46h1.69V3.94a22.69 22.69 0 0 0-2.46-.13c-2.43 0-4.09 1.48-4.09 4.2V10H7.47v3h2.75v8h3.28Z"></path>',
+    "</svg>",
+  ].join(""),
+  instagram: [
+    '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<rect height="17.5" rx="5" stroke="currentColor" stroke-width="1.8" width="17.5" x="3.25" y="3.25"></rect>',
+    '<circle cx="12" cy="12" r="4.15" stroke="currentColor" stroke-width="1.8"></circle>',
+    '<circle cx="17.45" cy="6.7" fill="currentColor" r="1.05"></circle>',
+    "</svg>",
+  ].join(""),
+  youtube: [
+    '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<rect height="13.5" rx="4" stroke="currentColor" stroke-width="1.8" width="19" x="2.5" y="5.25"></rect>',
+    '<path d="m10 8.75 5.25 3.25L10 15.25v-6.5Z" fill="currentColor"></path>',
+    "</svg>",
+  ].join(""),
+  linkedin: [
+    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<path d="M20.45 20.45H16.9v-5.57c0-1.33-.03-3.03-1.85-3.03-1.86 0-2.14 1.44-2.14 2.93v5.67H9.35V9h3.42v1.56h.05c.47-.9 1.63-1.85 3.37-1.85 3.6 0 4.26 2.37 4.26 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM3.56 9h3.56v11.45H3.56V9Z"></path>',
+    "</svg>",
+  ].join(""),
+  x: [
+    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<path d="M18.24 2.25h3.31l-7.23 8.26 8.51 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.84L7.08 4.13H5.12l11.96 15.64Z"></path>',
+    "</svg>",
+  ].join(""),
+  tiktok: [
+    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<g transform="translate(0 1) scale(.75)">',
+    '<path d="M22.46 3c.36 3.09 2.08 4.94 5.04 5.14v3.47c-1.71.17-3.22-.4-5-1.48v6.49c0 8.24-8.98 10.82-13.34 6.92-2.8-2.5-3.43-6.96-1.36-10.05 2.13-3.17 6.18-4.1 9.3-2.4v3.65c-.56-.18-1.07-.43-1.65-.51-1.4-.19-2.75.26-3.66 1.34-1.48 1.76-.95 4.6 1.06 5.71 2.45 1.35 5.9-.04 6.19-3.44.04-.5.02-1 .02-1.5V3h3.4Z"></path>',
+    "</g>",
+    "</svg>",
+  ].join(""),
+} as const satisfies Record<keyof typeof footerSocialIcons, string>;
+
 test("footer social icons include the exact supported platform keys", () => {
-  assert.deepEqual(Object.keys(footerSocialIcons), [
-    "facebook",
-    "instagram",
-    "youtube",
-    "linkedin",
-    "x",
-    "tiktok",
-  ]);
+  assert.deepEqual(Object.keys(footerSocialIcons), supportedPlatforms);
 });
 
 test("every footer social icon renders a normalized current-color svg", () => {
-  for (const [platform, Icon] of Object.entries(footerSocialIcons)) {
+  for (const platform of supportedPlatforms) {
+    const Icon = footerSocialIcons[platform];
     const markup = renderToStaticMarkup(React.createElement(Icon));
     const rootSvg = markup.match(/^<svg\b[^>]*>/)?.[0];
+    const paintValues = [
+      ...markup.matchAll(/\s(?:fill|stroke)="([^"]+)"/g),
+    ].map(([, value]) => value);
 
     assert.ok(rootSvg, `${platform} should render an svg root`);
     assert.match(
@@ -37,20 +81,25 @@ test("every footer social icon renders a normalized current-color svg", () => {
       /\s(?:width|height)=/,
       `${platform} should inherit its rendered size`,
     );
-    assert.match(
-      markup,
-      /\s(?:fill|stroke)="currentColor"/,
+    assert.ok(
+      paintValues.includes("currentColor"),
       `${platform} should inherit its visible color`,
     );
-    assert.doesNotMatch(
-      markup,
-      /fill="white"/i,
-      `${platform} should not force a white fill`,
-    );
+    for (const paintValue of paintValues) {
+      assert.ok(
+        paintValue === "currentColor" || paintValue === "none",
+        `${platform} should not use explicit ${paintValue} paint`,
+      );
+    }
     assert.doesNotMatch(
       markup,
       /\s(?:width|height)="32(?:px)?"/,
       `${platform} should not retain legacy 32px dimensions`,
+    );
+    assert.equal(
+      markup,
+      approvedMarkupByPlatform[platform],
+      `${platform} should retain its approved artwork`,
     );
   }
 });
