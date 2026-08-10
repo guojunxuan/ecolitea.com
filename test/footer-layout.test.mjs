@@ -55,9 +55,13 @@ test("uses the approved compact desktop footer typography hierarchy", () => {
   const copyright = getBlock(stylesheet, ".copyright");
 
   assert.match(tagline, /font-size:\s*12px\s*;/);
-  assert.match(heading, /font-size:\s*13px\s*;/);
+  assert.match(
+    stylesheet,
+    /\.navigationHeading,\s*\.mobileNavigationHeading,\s*\.newsletter h2\s*{/,
+  );
+  assert.match(heading, /font-size:\s*15px\s*;/);
   assert.match(heading, /font-weight:\s*600\s*;/);
-  assert.match(navigationLink, /font-size:\s*12px\s*;/);
+  assert.match(navigationLink, /font-size:\s*14px\s*;/);
   assert.match(navigationLink, /font-weight:\s*400\s*;/);
   assert.match(newsletterCopy, /font-size:\s*11px\s*;/);
   assert.match(contact, /font-size:\s*11px\s*;/);

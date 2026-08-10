@@ -43,7 +43,7 @@ const PanelHeader: React.FC<{
         onClick={onLinkActivate}
         prefetch={false}
       >
-        <FullLogo className="w-auto h-[30px]" />
+        <FullLogo />
       </Link>
       <span aria-hidden="true" />
     </div>
@@ -373,7 +373,7 @@ export const MobileNav: React.FC<NavItems> = (props) => {
             href="/"
             prefetch={false}
           >
-            <FullLogo className="w-auto h-[30px]" />
+            <FullLogo />
           </Link>
           <button
             aria-label="Search site"
