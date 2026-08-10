@@ -22,10 +22,10 @@ $footer-muted: var(--color-base-300);
 
 .content {
   display: grid;
-  grid-template-columns: minmax(0, 24fr) minmax(0, 46fr) minmax(0, 30fr);
-  gap: clamp(32px, 4vw, 72px);
+  grid-template-columns: minmax(0, 20fr) minmax(0, 55fr) minmax(0, 25fr);
+  gap: clamp(28px, 3vw, 48px);
   align-items: start;
-  padding: clamp(64px, 7vw, 104px) 0 clamp(56px, 6vw, 88px);
+  padding: clamp(54px, 6vw, 80px) 0 clamp(48px, 5vw, 72px);
 }
 
 .brand,
@@ -56,10 +56,10 @@ $footer-muted: var(--color-base-300);
 
 .tagline {
   max-width: 27ch;
-  margin: 0 0 26px;
+  margin: 0 0 21px;
   color: $footer-muted;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
@@ -110,7 +110,7 @@ $footer-muted: var(--color-base-300);
 .desktopNavigation {
   display: grid;
   grid-template-columns: repeat(var(--footer-column-count, 1), minmax(0, 1fr));
-  gap: clamp(24px, 3vw, 52px);
+  gap: clamp(18px, 2vw, 32px);
   width: 100%;
 }
 
@@ -121,12 +121,12 @@ $footer-muted: var(--color-base-300);
 .navigationHeading,
 .mobileNavigationHeading,
 .newsletter h2 {
-  margin: 0 0 20px;
+  margin: 0 0 14px;
   color: var(--color-base-200);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.25;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.055em;
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
@@ -136,15 +136,16 @@ $footer-muted: var(--color-base-300);
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .navigationLink {
   display: block;
   max-width: 100%;
   color: var(--color-base-200);
-  font-size: 15px;
-  line-height: 1.45;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.42;
   text-decoration: none;
   overflow-wrap: anywhere;
   transition: color $footer-transition;
@@ -170,7 +171,7 @@ $footer-muted: var(--color-base-300);
     max-width: 34ch;
     margin: 0;
     color: $footer-muted;
-    font-size: 14px;
+    font-size: 11px;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -180,11 +181,11 @@ $footer-muted: var(--color-base-300);
   display: flex;
   width: 100%;
   max-width: 286px;
-  margin-top: 18px;
+  margin-top: 14px;
 
   input,
   button {
-    height: 44px;
+    height: 37px;
     border: 1px solid var(--grid-line-dark);
     border-radius: 0;
     font-family: inherit;
@@ -231,10 +232,10 @@ $footer-muted: var(--color-base-300);
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 7px;
-  margin-top: 30px;
+  gap: 5px;
+  margin-top: 19px;
   color: $footer-muted;
-  font-size: 14px;
+  font-size: 11px;
   font-style: normal;
   line-height: 1.5;
 
@@ -270,9 +271,9 @@ $footer-muted: var(--color-base-300);
 
 .copyright {
   border-top: 1px solid var(--grid-line-dark);
-  padding: clamp(18px, 2vw, 26px) 0;
+  padding: 17px 0 20px;
   color: var(--color-base-400);
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.4;
 
   p {

@@ -37,12 +37,38 @@ test("uses the approved centered desktop proportions and dynamic navigation colu
   assert.match(stylesheet, /max-width:\s*1220px\s*;/);
   assert.match(
     content,
-    /grid-template-columns:\s*minmax\(0,\s*24fr\)\s+minmax\(0,\s*46fr\)\s+minmax\(0,\s*30fr\)\s*;/,
+    /grid-template-columns:\s*minmax\(0,\s*20fr\)\s+minmax\(0,\s*55fr\)\s+minmax\(0,\s*25fr\)\s*;/,
   );
   assert.match(
     desktopNavigation,
     /grid-template-columns:\s*repeat\(var\(--footer-column-count,\s*1\),\s*minmax\(0,\s*1fr\)\)\s*;/,
   );
+});
+
+test("uses the approved compact desktop footer typography hierarchy", () => {
+  const tagline = getBlock(stylesheet, ".tagline");
+  const heading = getBlock(stylesheet, ".navigationHeading");
+  const navigationLink = getBlock(stylesheet, "\n.navigationLink {");
+  const newsletter = getBlock(stylesheet, "\n.newsletter {");
+  const newsletterCopy = getBlock(newsletter, "p");
+  const contact = getBlock(stylesheet, ".contact");
+  const copyright = getBlock(stylesheet, ".copyright");
+
+  assert.match(tagline, /font-size:\s*12px\s*;/);
+  assert.match(heading, /font-size:\s*13px\s*;/);
+  assert.match(heading, /font-weight:\s*600\s*;/);
+  assert.match(navigationLink, /font-size:\s*12px\s*;/);
+  assert.match(navigationLink, /font-weight:\s*400\s*;/);
+  assert.match(newsletterCopy, /font-size:\s*11px\s*;/);
+  assert.match(contact, /font-size:\s*11px\s*;/);
+  assert.match(copyright, /font-size:\s*10px\s*;/);
+});
+
+test("keeps mobile navigation links at a readable touch-menu size", () => {
+  const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
+  const mobileNavigationLink = getBlock(mobileBreakpoint, ".navigationLink");
+
+  assert.match(mobileNavigationLink, /font-size:\s*16px\s*;/);
 });
 
 test("renders only the desktop navigation tree by default", () => {
