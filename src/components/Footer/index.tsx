@@ -10,13 +10,13 @@ import React, { useId, useState } from "react";
 
 import {
   getFooterCopyright,
-  getFooterEmailHref,
   getFooterLogoResource,
-  getFooterPhoneHref,
   getSafeFooterLink,
   isSafeFooterSocialURL,
   normalizeFooterRows,
 } from "./content.js";
+import { getFooterContactItems } from "./contact.js";
+import { footerContactIcons } from "./contactIcons";
 import { getNextFooterAccordionItem } from "./navigation.js";
 import { footerSocialIcons } from "./socialIcons";
 
@@ -43,12 +43,11 @@ export const Footer: React.FC<FooterType> = (props) => {
   } = props;
   const columns = normalizeFooterRows(columnsFromProps);
   const socialLinks = normalizeFooterRows(socialLinksFromProps);
+  const contactItems = getFooterContactItems(contact);
   const [openColumnID, setOpenColumnID] = useState<null | string>(null);
   const accordionID = useId();
   const currentYear = new Date().getUTCFullYear();
   const logoResource = getFooterLogoResource(brand?.logo, brand?.logoAlt);
-  const phoneHref = getFooterPhoneHref(contact?.phone);
-  const emailHref = getFooterEmailHref(contact?.email);
 
   return (
     <footer className={classes.footer} data-theme="dark">
@@ -256,9 +255,29 @@ export const Footer: React.FC<FooterType> = (props) => {
               </div>
 
               <address className={classes.contact}>
-                {contact?.address ? <p>{contact.address}</p> : null}
-                {phoneHref ? <a href={phoneHref}>{contact?.phone}</a> : null}
-                {emailHref ? <a href={emailHref}>{contact?.email}</a> : null}
+                <ul className={classes.contactList}>
+                  {contactItems.map((item) => {
+                    const Icon = footerContactIcons[item.kind];
+
+                    return (
+                      <li className={classes.contactItem} key={item.kind}>
+                        <span
+                          aria-hidden="true"
+                          className={classes.contactIcon}
+                        >
+                          <Icon />
+                        </span>
+                        {"href" in item ? (
+                          <a href={item.href}>{item.text}</a>
+                        ) : (
+                          <span className={classes.contactText}>
+                            {item.text}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </address>
             </section>
           </div>

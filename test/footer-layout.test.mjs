@@ -6,6 +6,10 @@ const stylesheet = readFileSync(
   new URL("../src/components/Footer/index.module.scss", import.meta.url),
   "utf8",
 );
+const footerComponent = readFileSync(
+  new URL("../src/components/Footer/index.tsx", import.meta.url),
+  "utf8",
+);
 
 const getBlock = (source, selector) => {
   const selectorIndex = source.indexOf(selector);
@@ -150,6 +154,90 @@ test("gives mobile contact anchors a minimum touch target", () => {
   assert.match(mobileContactAnchor, /display:\s*flex\s*;/);
   assert.match(mobileContactAnchor, /min-height:\s*44px\s*;/);
   assert.match(mobileContactAnchor, /align-items:\s*center\s*;/);
+});
+
+test("centers mobile contact icons beside touch-target links", () => {
+  const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
+  const mobileContactLinkItem = getBlock(
+    mobileBreakpoint,
+    ".contactItem:has(a)",
+  );
+
+  assert.match(mobileContactLinkItem, /align-items:\s*center\s*;/);
+});
+
+test("lays out the footer contact list as unstyled stacked rows", () => {
+  const contactList = getBlock(stylesheet, ".contactList");
+  const contactItem = getBlock(stylesheet, ".contactItem");
+
+  assert.match(contactList, /display:\s*flex\s*;/);
+  assert.match(contactList, /flex-direction:\s*column\s*;/);
+  assert.match(contactList, /gap:\s*11px\s*;/);
+  assert.match(contactList, /margin:\s*0\s*;/);
+  assert.match(contactList, /padding:\s*0\s*;/);
+  assert.match(contactList, /list-style:\s*none\s*;/);
+  assert.match(contactItem, /display:\s*grid\s*;/);
+  assert.match(
+    contactItem,
+    /grid-template-columns:\s*20px\s+minmax\(0,\s*1fr\)\s*;/,
+  );
+  assert.match(contactItem, /gap:\s*10px\s*;/);
+  assert.match(contactItem, /align-items:\s*start\s*;/);
+  assert.match(contactItem, /min-width:\s*0\s*;/);
+});
+
+test("sizes footer contact icons consistently", () => {
+  const contactIcon = getBlock(stylesheet, ".contactIcon");
+  const contactIconSvg = getBlock(contactIcon, "svg");
+
+  assert.match(contactIcon, /width:\s*16px\s*;/);
+  assert.match(contactIcon, /height:\s*16px\s*;/);
+  assert.match(contactIconSvg, /display:\s*block\s*;/);
+  assert.match(contactIconSvg, /width:\s*16px\s*;/);
+  assert.match(contactIconSvg, /height:\s*16px\s*;/);
+});
+
+test("lets footer contact text preserve lines and wrap safely", () => {
+  const contactText = getBlock(stylesheet, ".contactText");
+
+  assert.match(contactText, /min-width:\s*0\s*;/);
+  assert.match(contactText, /white-space:\s*pre-line\s*;/);
+  assert.match(contactText, /overflow-wrap:\s*anywhere\s*;/);
+});
+
+test("renders normalized footer contacts as a semantic icon list", () => {
+  assert.match(
+    footerComponent,
+    /import\s*{\s*getFooterContactItems\s*}\s*from\s*["']\.\/contact(?:\.js)?["'];/,
+  );
+  assert.match(
+    footerComponent,
+    /import\s*{\s*footerContactIcons\s*}\s*from\s*["']\.\/contactIcons(?:\.js)?["'];/,
+  );
+  assert.match(
+    footerComponent,
+    /const contactItems = getFooterContactItems\(contact\);/,
+  );
+  assert.match(
+    footerComponent,
+    /<address className={classes\.contact}>\s*<ul className={classes\.contactList}>\s*{contactItems\.map\(\(item\) => {\s*const Icon = footerContactIcons\[item\.kind\];/,
+  );
+  assert.match(
+    footerComponent,
+    /<li className={classes\.contactItem} key={item\.kind}>/,
+  );
+  assert.match(
+    footerComponent,
+    /<span\s+aria-hidden="true"\s+className={classes\.contactIcon}\s*>\s*<Icon \/>\s*<\/span>/,
+  );
+  assert.match(
+    footerComponent,
+    /{"href" in item \? \(\s*<a href={item\.href}>{item\.text}<\/a>\s*\) : \(\s*<span className={classes\.contactText}>\s*{item\.text}\s*<\/span>/,
+  );
+  assert.doesNotMatch(
+    footerComponent,
+    /{contact\?\.(?:address|phone|email)\s*\?\s*<(?:p|a)\b/,
+  );
 });
 
 test("removes legacy decorative footer selectors", () => {

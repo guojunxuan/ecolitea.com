@@ -228,30 +228,17 @@ $footer-muted: var(--color-base-300);
 }
 
 .contact {
-  display: flex;
   min-width: 0;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
   margin-top: 19px;
   color: $footer-muted;
   font-size: 11px;
   font-style: normal;
   line-height: 1.5;
 
-  p,
   a {
     max-width: 100%;
     margin: 0;
     overflow-wrap: anywhere;
-  }
-
-  p {
-    margin-bottom: 4px;
-    white-space: pre-line;
-  }
-
-  a {
     color: var(--color-base-200);
     text-decoration: none;
     transition: color $footer-transition;
@@ -267,6 +254,45 @@ $footer-muted: var(--color-base-300);
       color: var(--color-base-0);
     }
   }
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contactItem {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+}
+
+.contactIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: var(--color-base-200);
+
+  svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.contactText {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 .copyright {
@@ -401,6 +427,10 @@ $footer-muted: var(--color-base-300);
       min-height: 44px;
       align-items: center;
     }
+  }
+
+  .contactItem:has(a) {
+    align-items: center;
   }
 
   .copyright {
