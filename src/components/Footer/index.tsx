@@ -16,7 +16,7 @@ import {
   normalizeFooterRows,
 } from "./content.js";
 import { getFooterContactItems } from "./contact.js";
-import { footerContactIcons } from "./contactIcons";
+import { FooterContactList } from "./ContactList";
 import { getNextFooterAccordionItem } from "./navigation.js";
 import { footerSocialIcons } from "./socialIcons";
 
@@ -254,31 +254,16 @@ export const Footer: React.FC<FooterType> = (props) => {
                 </div>
               </div>
 
-              <address className={classes.contact}>
-                <ul className={classes.contactList}>
-                  {contactItems.map((item) => {
-                    const Icon = footerContactIcons[item.kind];
-
-                    return (
-                      <li className={classes.contactItem} key={item.kind}>
-                        <span
-                          aria-hidden="true"
-                          className={classes.contactIcon}
-                        >
-                          <Icon />
-                        </span>
-                        {"href" in item ? (
-                          <a href={item.href}>{item.text}</a>
-                        ) : (
-                          <span className={classes.contactText}>
-                            {item.text}
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </address>
+              <FooterContactList
+                classNames={{
+                  contact: classes.contact,
+                  contactIcon: classes.contactIcon,
+                  contactItem: classes.contactItem,
+                  contactList: classes.contactList,
+                  contactText: classes.contactText,
+                }}
+                items={contactItems}
+              />
             </section>
           </div>
 

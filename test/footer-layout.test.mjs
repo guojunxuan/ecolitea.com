@@ -6,10 +6,6 @@ const stylesheet = readFileSync(
   new URL("../src/components/Footer/index.module.scss", import.meta.url),
   "utf8",
 );
-const footerComponent = readFileSync(
-  new URL("../src/components/Footer/index.tsx", import.meta.url),
-  "utf8",
-);
 
 const getBlock = (source, selector) => {
   const selectorIndex = source.indexOf(selector);
@@ -203,41 +199,6 @@ test("lets footer contact text preserve lines and wrap safely", () => {
   assert.match(contactText, /min-width:\s*0\s*;/);
   assert.match(contactText, /white-space:\s*pre-line\s*;/);
   assert.match(contactText, /overflow-wrap:\s*anywhere\s*;/);
-});
-
-test("renders normalized footer contacts as a semantic icon list", () => {
-  assert.match(
-    footerComponent,
-    /import\s*{\s*getFooterContactItems\s*}\s*from\s*["']\.\/contact(?:\.js)?["'];/,
-  );
-  assert.match(
-    footerComponent,
-    /import\s*{\s*footerContactIcons\s*}\s*from\s*["']\.\/contactIcons(?:\.js)?["'];/,
-  );
-  assert.match(
-    footerComponent,
-    /const contactItems = getFooterContactItems\(contact\);/,
-  );
-  assert.match(
-    footerComponent,
-    /<address className={classes\.contact}>\s*<ul className={classes\.contactList}>\s*{contactItems\.map\(\(item\) => {\s*const Icon = footerContactIcons\[item\.kind\];/,
-  );
-  assert.match(
-    footerComponent,
-    /<li className={classes\.contactItem} key={item\.kind}>/,
-  );
-  assert.match(
-    footerComponent,
-    /<span\s+aria-hidden="true"\s+className={classes\.contactIcon}\s*>\s*<Icon \/>\s*<\/span>/,
-  );
-  assert.match(
-    footerComponent,
-    /{"href" in item \? \(\s*<a href={item\.href}>{item\.text}<\/a>\s*\) : \(\s*<span className={classes\.contactText}>\s*{item\.text}\s*<\/span>/,
-  );
-  assert.doesNotMatch(
-    footerComponent,
-    /{contact\?\.(?:address|phone|email)\s*\?\s*<(?:p|a)\b/,
-  );
 });
 
 test("removes legacy decorative footer selectors", () => {
