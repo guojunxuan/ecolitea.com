@@ -1,6 +1,6 @@
-import type { FC } from "react";
+import * as React from "react";
 
-export const EmailIcon: FC = () => {
+export const EmailIcon: React.FC = () => {
   return (
     <svg
       aria-hidden="true"

@@ -1,6 +1,6 @@
-import type { FC } from "react";
+import * as React from "react";
 
-export const PhoneIcon: FC = () => {
+export const PhoneIcon: React.FC = () => {
   return (
     <svg
       aria-hidden="true"
