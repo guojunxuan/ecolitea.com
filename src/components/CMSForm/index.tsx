@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 
 import { fields } from './fields'
 import classes from './index.module.scss'
+import { isRecaptchaRequired } from './recaptcha.js'
 import Submit from './Submit/index'
 
 const buildInitialState = (fields) => {
@@ -49,6 +50,7 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
   const initialState = buildInitialState(form.fields)
 
   const recaptcha = React.useRef<ReCAPTCHA>(null)
+  const requiresRecaptcha = isRecaptchaRequired(form.requireRecaptcha)
 
   const router = useRouter()
 
@@ -61,9 +63,9 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
 
         setIsLoading(true)
 
-        const captchaValue = recaptcha.current ? recaptcha.current.getValue() : undefined
+        const captchaValue = requiresRecaptcha ? recaptcha.current?.getValue() : undefined
 
-        if (recaptcha && !captchaValue) {
+        if (requiresRecaptcha && !captchaValue) {
           setIsLoading(false)
           toast.error('Please complete the reCAPTCHA.')
 
@@ -138,7 +140,7 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
 
       void submitForm()
     },
-    [router, formID, formRedirect, confirmationType, pathname],
+    [router, formID, formRedirect, confirmationType, pathname, requiresRecaptcha],
   )
 
   if (!form?.id) {
@@ -185,14 +187,16 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
               })}
               <CrosshairIcon className={[classes.crosshair, classes.crosshairLeft].join(' ')} />
             </div>
-            <div className={classes.captchaWrap}>
-              <ReCAPTCHA
-                className={classes.captcha}
-                ref={recaptcha}
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
-                theme="dark"
-              />
-            </div>
+            {requiresRecaptcha && (
+              <div className={classes.captchaWrap}>
+                <ReCAPTCHA
+                  className={classes.captcha}
+                  ref={recaptcha}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ''}
+                  theme="dark"
+                />
+              </div>
+            )}
             <Submit
               className={[classes.submitButton, classes.hideTopBorder].filter(Boolean).join(' ')}
               disabled={isLoading}
