@@ -2,22 +2,24 @@ import type { ComponentType } from "react";
 
 import type { Footer } from "@root/payload-types";
 
-import { FacebookIcon } from "../../graphics/FacebookIcon";
-import { InstagramIcon } from "../../graphics/InstagramIcon";
-import { LinkedInIcon } from "../../graphics/LinkedInIcon";
-import { TikTokIcon } from "../../graphics/TikTokIcon";
-import { TwitterIconAlt } from "../../graphics/TwitterIconAlt";
-import { YoutubeIcon } from "../../graphics/YoutubeIcon";
+import {
+  FooterFacebookIcon,
+  FooterInstagramIcon,
+  FooterLinkedInIcon,
+  FooterTikTokIcon,
+  FooterXIcon,
+  FooterYoutubeIcon,
+} from "../../graphics/FooterSocialIcons";
 
 type FooterSocialPlatform = NonNullable<
   Footer["socialLinks"]
 >[number]["platform"];
 
 export const footerSocialIcons = {
-  facebook: FacebookIcon,
-  instagram: InstagramIcon,
-  youtube: YoutubeIcon,
-  linkedin: LinkedInIcon,
-  x: TwitterIconAlt,
-  tiktok: TikTokIcon,
+  facebook: FooterFacebookIcon,
+  instagram: FooterInstagramIcon,
+  youtube: FooterYoutubeIcon,
+  linkedin: FooterLinkedInIcon,
+  x: FooterXIcon,
+  tiktok: FooterTikTokIcon,
 } as const satisfies Record<FooterSocialPlatform, ComponentType>;

@@ -68,6 +68,29 @@ test("uses the approved compact desktop footer typography hierarchy", () => {
   assert.match(copyright, /font-size:\s*10px\s*;/);
 });
 
+test("sizes footer social controls and glyphs consistently", () => {
+  const socialLinks = getBlock(stylesheet, "\n.socialLinks {");
+  const socialLink = getBlock(stylesheet, "\n.socialLink {");
+  const socialGlyph = getBlock(socialLink, "span,");
+
+  assert.match(socialLinks, /gap:\s*10px\s*;/);
+  assert.match(socialLink, /width:\s*36px\s*;/);
+  assert.match(socialLink, /height:\s*36px\s*;/);
+  assert.match(socialLink, /opacity:\s*0?\.85\s*;/);
+  assert.match(socialLink, /span,\s*svg\s*{/);
+  assert.match(socialGlyph, /display:\s*block\s*;/);
+  assert.match(socialGlyph, /width:\s*24px\s*;/);
+  assert.match(socialGlyph, /height:\s*24px\s*;/);
+});
+
+test("enlarges footer social controls at the mobile header breakpoint", () => {
+  const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
+  const mobileSocialLink = getBlock(mobileBreakpoint, ".socialLink");
+
+  assert.match(mobileSocialLink, /width:\s*40px\s*;/);
+  assert.match(mobileSocialLink, /height:\s*40px\s*;/);
+});
+
 test("keeps mobile navigation links at a readable touch-menu size", () => {
   const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
   const mobileNavigationLink = getBlock(mobileBreakpoint, ".navigationLink");
