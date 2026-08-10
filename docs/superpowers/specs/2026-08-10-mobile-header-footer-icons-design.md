@@ -17,6 +17,17 @@ This design covers three focused changes:
 
 It does not add site search behavior, change the mobile drawer interaction, change Footer CMS fields, introduce Elementor, or add an icon-upload workflow.
 
+## Footer Layout and Typography Baseline
+
+The implementation must preserve the following approved Footer baseline while adding icons:
+
+- centered maximum content width: 1220px;
+- navigation heading: 15px;
+- navigation link: 14px;
+- navigation heading weight remains stronger than the link weight.
+
+Any current working-tree experiment using a 1280px maximum width must be restored to 1220px. The existing 14px navigation-link edit is retained, and the heading increases to 15px so the title remains visually dominant.
+
 ## Mobile Header
 
 ### Geometry
@@ -111,7 +122,7 @@ Expected implementation changes are limited to:
 - focused icon components under `src/graphics/`
 - existing focused Header/Footer tests under `test/`
 
-The current unrelated working-tree changes to Footer width and navigation-link typography are user-owned and must be preserved rather than overwritten.
+The implementation must preserve unrelated user work while deliberately normalizing the approved Footer width and navigation typography to 1220px / 15px / 14px.
 
 ## Accessibility
 
@@ -131,8 +142,9 @@ Implementation verification must cover:
 2. Footer rendering tests for address, phone, and email rows with the correct icon and no empty row when a value is absent.
 3. Social icon tests proving all six generated platform keys still map to renderable React components.
 4. Footer layout tests for 24px social SVGs, 36px desktop boxes, 40px mobile boxes, and 10px row gap.
-5. TypeScript, Prettier, Sass compilation, existing Header/Footer test suites, and `git diff --check`.
-6. Visual checks at 390px mobile width and a desktop viewport above the 1170px handoff.
+5. Footer layout tests for the 1220px maximum width, 15px navigation headings, and 14px navigation links.
+6. TypeScript, Prettier, Sass compilation, existing Header/Footer test suites, and `git diff --check`.
+7. Visual checks at 390px mobile width and a desktop viewport above the 1170px handoff.
 
 ## Approved Visual Reference
 
