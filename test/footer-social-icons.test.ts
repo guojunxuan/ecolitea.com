@@ -27,20 +27,9 @@ const approvedMarkupByPlatform = {
     '<circle cx="17.45" cy="6.7" fill="currentColor" r="1.05"></circle>',
     "</svg>",
   ].join(""),
-  youtube: [
-    '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
-    '<rect height="13.5" rx="4" stroke="currentColor" stroke-width="1.8" width="19" x="2.5" y="5.25"></rect>',
-    '<path d="m10 8.75 5.25 3.25L10 15.25v-6.5Z" fill="currentColor"></path>',
-    "</svg>",
-  ].join(""),
   linkedin: [
     '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
     '<path d="M20.45 20.45H16.9v-5.57c0-1.33-.03-3.03-1.85-3.03-1.86 0-2.14 1.44-2.14 2.93v5.67H9.35V9h3.42v1.56h.05c.47-.9 1.63-1.85 3.37-1.85 3.6 0 4.26 2.37 4.26 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM3.56 9h3.56v11.45H3.56V9Z"></path>',
-    "</svg>",
-  ].join(""),
-  x: [
-    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
-    '<path d="M18.24 2.25h3.31l-7.23 8.26 8.51 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.84L7.08 4.13H5.12l11.96 15.64Z"></path>',
     "</svg>",
   ].join(""),
   tiktok: [
@@ -50,13 +39,24 @@ const approvedMarkupByPlatform = {
     "</g>",
     "</svg>",
   ].join(""),
+  x: [
+    '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<path d="M18.24 2.25h3.31l-7.23 8.26 8.51 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.84L7.08 4.13H5.12l11.96 15.64Z"></path>',
+    "</svg>",
+  ].join(""),
+  youtube: [
+    '<svg aria-hidden="true" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">',
+    '<rect height="13.5" rx="4" stroke="currentColor" stroke-width="1.8" width="19" x="2.5" y="5.25"></rect>',
+    '<path d="m10 8.75 5.25 3.25L10 15.25v-6.5Z" fill="currentColor"></path>',
+    "</svg>",
+  ].join(""),
 } as const satisfies Record<keyof typeof footerSocialIcons, string>;
 
-test("footer social icons include the exact supported platform keys", () => {
+void test("footer social icons include the exact supported platform keys", () => {
   assert.deepEqual(Object.keys(footerSocialIcons), supportedPlatforms);
 });
 
-test("every footer social icon renders a normalized current-color svg", () => {
+void test("every footer social icon renders a normalized current-color svg", () => {
   for (const platform of supportedPlatforms) {
     const Icon = footerSocialIcons[platform];
     const markup = renderToStaticMarkup(React.createElement(Icon));
