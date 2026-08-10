@@ -45,6 +45,9 @@ const getBlock = (source, selector) => {
   assert.fail(`Expected ${selector} to close its block`);
 };
 
+const getSelfClosingTags = (source, componentName) =>
+  source.match(new RegExp(`<${componentName}\\b[^>]*\\/>`, "gs")) ?? [];
+
 test("uses the approved three-column 60px mobile header geometry", () => {
   const menuBar = getBlock(stylesheet, ".menuBar");
   const menuBarContainer = getBlock(stylesheet, ".menuBarContainer");
@@ -57,10 +60,7 @@ test("uses the approved three-column 60px mobile header geometry", () => {
     /grid-template-columns:\s*29fr\s+42fr\s+29fr\s*;/,
   );
   assert.match(panelHeader, /min-height:\s*60px\s*;/);
-  assert.match(
-    panelHeader,
-    /grid-template-columns:\s*29fr\s+42fr\s+29fr\s*;/,
-  );
+  assert.match(panelHeader, /grid-template-columns:\s*29fr\s+42fr\s+29fr\s*;/);
 });
 
 test("sets the mobile logo dimensions in the stylesheet", () => {
@@ -71,9 +71,21 @@ test("sets the mobile logo dimensions in the stylesheet", () => {
   assert.match(logoSvg, /height:\s*30px\s*;/);
 });
 
-test("renders both full logos without utility sizing overrides", () => {
-  assert.doesNotMatch(mobileNav, /h-\[30px\]/);
-  assert.equal(mobileNav.match(/<FullLogo\b/g)?.length, 2);
+test("renders exactly two plain full logos without prop overrides", () => {
+  assert.deepEqual(getSelfClosingTags(mobileNav, "FullLogo"), [
+    "<FullLogo />",
+    "<FullLogo />",
+  ]);
+});
+
+test("renders the approved plain mobile action icon components", () => {
+  assert.deepEqual(getSelfClosingTags(mobileNav, "MenuIcon"), [
+    "<MenuIcon />",
+    "<MenuIcon />",
+  ]);
+  assert.deepEqual(getSelfClosingTags(mobileNav, "SearchIcon"), [
+    "<SearchIcon />",
+  ]);
 });
 
 test("keeps the mobile action icons at their approved intrinsic sizes", () => {
