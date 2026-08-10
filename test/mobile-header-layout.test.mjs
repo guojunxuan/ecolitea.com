@@ -48,6 +48,20 @@ const getBlock = (source, selector) => {
 const getSelfClosingTags = (source, componentName) =>
   source.match(new RegExp(`<${componentName}\\b[^>]*\\/>`, "gs")) ?? [];
 
+const countOpeningTags = (source, componentName) =>
+  source.match(new RegExp(`<${componentName}\\b`, "g"))?.length ?? 0;
+
+const getButton = (source, description, patterns) => {
+  const buttons = source.match(/<button\b[\s\S]*?<\/button>/g) ?? [];
+  const matches = buttons.filter((button) =>
+    patterns.every((pattern) => pattern.test(button)),
+  );
+
+  assert.equal(matches.length, 1, `Expected exactly one ${description} button`);
+
+  return matches[0];
+};
+
 test("uses the approved three-column 60px mobile header geometry", () => {
   const menuBar = getBlock(stylesheet, ".menuBar");
   const menuBarContainer = getBlock(stylesheet, ".menuBarContainer");
@@ -72,6 +86,7 @@ test("sets the mobile logo dimensions in the stylesheet", () => {
 });
 
 test("renders exactly two plain full logos without prop overrides", () => {
+  assert.equal(countOpeningTags(mobileNav, "FullLogo"), 2);
   assert.deepEqual(getSelfClosingTags(mobileNav, "FullLogo"), [
     "<FullLogo />",
     "<FullLogo />",
@@ -79,11 +94,35 @@ test("renders exactly two plain full logos without prop overrides", () => {
 });
 
 test("renders the approved plain mobile action icon components", () => {
+  const panelCloseButton = getButton(mobileNav, "panel close", [
+    /aria-label="Close menu"/,
+    /className=\{classes\.closeButton\}/,
+  ]);
+  const mainMenuToggle = getButton(mobileNav, "main menu toggle", [
+    /aria-label=\{isMenuOpen\s*\?\s*"Close menu"\s*:\s*"Open menu"\}/,
+    /classes\.modalToggler/,
+  ]);
+  const searchButton = getButton(mobileNav, "search", [
+    /aria-label="Search site"/,
+    /className=\{classes\.searchButton\}/,
+  ]);
+
+  assert.equal(countOpeningTags(mobileNav, "MenuIcon"), 2);
+  assert.equal(countOpeningTags(mobileNav, "SearchIcon"), 1);
   assert.deepEqual(getSelfClosingTags(mobileNav, "MenuIcon"), [
     "<MenuIcon />",
     "<MenuIcon />",
   ]);
   assert.deepEqual(getSelfClosingTags(mobileNav, "SearchIcon"), [
+    "<SearchIcon />",
+  ]);
+  assert.deepEqual(getSelfClosingTags(panelCloseButton, "MenuIcon"), [
+    "<MenuIcon />",
+  ]);
+  assert.deepEqual(getSelfClosingTags(mainMenuToggle, "MenuIcon"), [
+    "<MenuIcon />",
+  ]);
+  assert.deepEqual(getSelfClosingTags(searchButton, "SearchIcon"), [
     "<SearchIcon />",
   ]);
 });
