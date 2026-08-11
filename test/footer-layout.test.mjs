@@ -45,7 +45,7 @@ test("uses the approved centered desktop proportions and dynamic navigation colu
   );
 });
 
-test("uses the approved compact desktop footer typography hierarchy", () => {
+test("uses the approved footer navigation typography hierarchy", () => {
   const tagline = getBlock(stylesheet, ".tagline");
   const heading = getBlock(stylesheet, ".navigationHeading");
   const navigationLink = getBlock(stylesheet, "\n.navigationLink {");
@@ -59,9 +59,9 @@ test("uses the approved compact desktop footer typography hierarchy", () => {
     stylesheet,
     /\.navigationHeading,\s*\.mobileNavigationHeading,\s*\.newsletter h2\s*{/,
   );
-  assert.match(heading, /font-size:\s*15px\s*;/);
+  assert.match(heading, /font-size:\s*14px\s*;/);
   assert.match(heading, /font-weight:\s*600\s*;/);
-  assert.match(navigationLink, /font-size:\s*14px\s*;/);
+  assert.match(navigationLink, /font-size:\s*13px\s*;/);
   assert.match(navigationLink, /font-weight:\s*400\s*;/);
   assert.match(newsletterCopy, /font-size:\s*11px\s*;/);
   assert.match(contact, /font-size:\s*11px\s*;/);
@@ -91,11 +91,11 @@ test("enlarges footer social controls at the mobile header breakpoint", () => {
   assert.match(mobileSocialLink, /height:\s*40px\s*;/);
 });
 
-test("keeps mobile navigation links at a readable touch-menu size", () => {
+test("uses the approved mobile navigation link size", () => {
   const mobileBreakpoint = getBlock(stylesheet, "@include mobile-header-break");
   const mobileNavigationLink = getBlock(mobileBreakpoint, ".navigationLink");
 
-  assert.match(mobileNavigationLink, /font-size:\s*16px\s*;/);
+  assert.match(mobileNavigationLink, /font-size:\s*13px\s*;/);
 });
 
 test("renders only the desktop navigation tree by default", () => {
