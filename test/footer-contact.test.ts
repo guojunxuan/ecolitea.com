@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { getFooterContactItems } from "../src/components/Footer/contact";
 
-test("footer contact items trim and order safe address, phone, and email rows", () => {
+void test("footer contact items trim and order safe address, phone, and email rows", () => {
   assert.deepEqual(
     getFooterContactItems({
       address: "  Shenzhen, China  ",
@@ -26,7 +26,7 @@ test("footer contact items trim and order safe address, phone, and email rows", 
   );
 });
 
-test("footer contact items omit empty or unusable contact values", () => {
+void test("footer contact items omit empty or unusable contact values", () => {
   assert.deepEqual(
     getFooterContactItems({ address: " ", email: "", phone: "abc" }),
     [],

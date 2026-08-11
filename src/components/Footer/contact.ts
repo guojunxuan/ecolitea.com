@@ -4,7 +4,8 @@ import { getFooterEmailHref, getFooterPhoneHref } from "./content.js";
 
 export type FooterContactItem =
   | {
-      kind: "address";
+      href: string;
+      kind: "email";
       text: string;
     }
   | {
@@ -13,8 +14,7 @@ export type FooterContactItem =
       text: string;
     }
   | {
-      href: string;
-      kind: "email";
+      kind: "address";
       text: string;
     };
 
@@ -31,7 +31,9 @@ export const getFooterContactItems = (
   const emailHref = getFooterEmailHref(email);
   const items: FooterContactItem[] = [];
 
-  if (address) items.push({ kind: "address", text: address });
+  if (address) {
+    items.push({ kind: "address", text: address });
+  }
   if (phone && phoneHref) {
     items.push({ href: phoneHref, kind: "phone", text: phone });
   }

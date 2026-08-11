@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { footerContactIcons } from "../src/components/Footer/contactIcons";
 
-test("footer contact icons exactly cover every contact kind", () => {
+void test("footer contact icons exactly cover every contact kind", () => {
   assert.deepEqual(Object.keys(footerContactIcons), [
     "address",
     "phone",
@@ -13,7 +13,7 @@ test("footer contact icons exactly cover every contact kind", () => {
   ]);
 });
 
-test("every footer contact icon renders a decorative CSS-sized SVG", () => {
+void test("every footer contact icon renders a decorative CSS-sized SVG", () => {
   for (const Icon of Object.values(footerContactIcons)) {
     const markup = renderToStaticMarkup(React.createElement(Icon));
     const openingSvgTag = markup.match(/^<svg\b[^>]*>/)?.[0];

@@ -28,7 +28,15 @@ export const rootParserOptions = {
   ecmaVersion: 'latest',
   projectService: {
     maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 40,
-    allowDefaultProject: ['scripts/*.ts', 'scripts/*.js', '*.js', '*.mjs', '*.spec.ts', '*.d.ts'],
+    allowDefaultProject: [
+      'scripts/*.ts',
+      'scripts/*.js',
+      'test/*.mjs',
+      '*.js',
+      '*.mjs',
+      '*.spec.ts',
+      '*.d.ts',
+    ],
   },
 }
 
@@ -55,7 +63,6 @@ const config = [
     languageOptions: {
       parserOptions: {
         ...rootParserOptions,
-        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },

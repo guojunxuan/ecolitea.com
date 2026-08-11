@@ -13,8 +13,8 @@ import * as React from "react";
 import { FullLogo } from "../../../graphics/FullLogo/index";
 import { MenuIcon } from "../../../graphics/MenuIcon/index";
 import { CMSLink } from "../../CMSLink/index";
-import { getMobileNavigationAction } from "./navigation.js";
 import classes from "./index.module.scss";
+import { getMobileNavigationAction } from "./navigation.js";
 
 export const modalSlug = "mobile-nav";
 
@@ -164,6 +164,7 @@ const MobileMenuModal: React.FC<
       onClick={onClose}
       slug={modalSlug}
     >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This non-interactive panel only prevents clicks from reaching the modal backdrop. */}
       <div
         className={classes.mobileMenuPanel}
         data-theme="light"

@@ -8,6 +8,8 @@ import { Media } from "@components/Media/index";
 import { getFooterSocialPlatformLabel } from "@root/globals/footerSocials.js";
 import React, { useId, useState } from "react";
 
+import { getFooterContactItems } from "./contact.js";
+import { FooterContactList } from "./ContactList";
 import {
   getFooterCopyright,
   getFooterLogoResource,
@@ -15,12 +17,9 @@ import {
   isSafeFooterSocialURL,
   normalizeFooterRows,
 } from "./content.js";
-import { getFooterContactItems } from "./contact.js";
-import { FooterContactList } from "./ContactList";
+import classes from "./index.module.scss";
 import { getNextFooterAccordionItem } from "./navigation.js";
 import { footerSocialIcons } from "./socialIcons";
-
-import classes from "./index.module.scss";
 
 const hasFooterSocialIcon = (
   platform: unknown,
@@ -69,7 +68,9 @@ export const Footer: React.FC<FooterType> = (props) => {
 
               <ul aria-label="Social media" className={classes.socialLinks}>
                 {socialLinks.map((socialLink, index) => {
-                  if (!isFooterRecord(socialLink)) return null;
+                  if (!isFooterRecord(socialLink)) {
+                    return null;
+                  }
 
                   const { id, platform, url } = socialLink;
                   if (
@@ -115,10 +116,14 @@ export const Footer: React.FC<FooterType> = (props) => {
                 }
               >
                 {columns.map((column, columnIndex) => {
-                  if (!isFooterRecord(column)) return null;
+                  if (!isFooterRecord(column)) {
+                    return null;
+                  }
 
                   const { id, label, navItems: navItemsFromColumn } = column;
-                  if (typeof label !== "string" || !label.trim()) return null;
+                  if (typeof label !== "string" || !label.trim()) {
+                    return null;
+                  }
 
                   const navItems = normalizeFooterRows(navItemsFromColumn);
                   const columnKey =
@@ -133,13 +138,17 @@ export const Footer: React.FC<FooterType> = (props) => {
                       <h2 className={classes.navigationHeading}>{label}</h2>
                       <div className={classes.navigationLinks}>
                         {navItems.map((navItem, linkIndex) => {
-                          if (!isFooterRecord(navItem)) return null;
+                          if (!isFooterRecord(navItem)) {
+                            return null;
+                          }
 
                           const safeLink = getSafeFooterLink(
                             navItem.link,
                             "desktop",
                           );
-                          if (!safeLink) return null;
+                          if (!safeLink) {
+                            return null;
+                          }
 
                           const navItemID = navItem.id;
                           const linkLabel = safeLink.label;
@@ -163,10 +172,14 @@ export const Footer: React.FC<FooterType> = (props) => {
 
               <div className={classes.mobileNavigation}>
                 {columns.map((column, columnIndex) => {
-                  if (!isFooterRecord(column)) return null;
+                  if (!isFooterRecord(column)) {
+                    return null;
+                  }
 
                   const { id, label, navItems: navItemsFromColumn } = column;
-                  if (typeof label !== "string" || !label.trim()) return null;
+                  if (typeof label !== "string" || !label.trim()) {
+                    return null;
+                  }
 
                   const navItems = normalizeFooterRows(navItemsFromColumn);
                   const columnID =
@@ -202,13 +215,17 @@ export const Footer: React.FC<FooterType> = (props) => {
                         id={panelID}
                       >
                         {navItems.map((navItem, linkIndex) => {
-                          if (!isFooterRecord(navItem)) return null;
+                          if (!isFooterRecord(navItem)) {
+                            return null;
+                          }
 
                           const safeLink = getSafeFooterLink(
                             navItem.link,
                             "mobile",
                           );
-                          if (!safeLink) return null;
+                          if (!safeLink) {
+                            return null;
+                          }
 
                           const navItemID = navItem.id;
                           const linkLabel = safeLink.label;

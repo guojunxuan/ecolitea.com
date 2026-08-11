@@ -4,6 +4,7 @@ import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import type { FooterContactItem } from "../src/components/Footer/contact";
+
 import { FooterContactList } from "../src/components/Footer/ContactList";
 
 const classNames = {
@@ -22,7 +23,7 @@ const renderContactList = (items: FooterContactItem[]) =>
 const getTags = (markup: string, tagName: string) =>
   markup.match(new RegExp(`<${tagName}\\b[^>]*>`, "g")) ?? [];
 
-test("renders complete footer contacts as ordered semantic icon rows", () => {
+void test("renders complete footer contacts as ordered semantic icon rows", () => {
   const markup = renderContactList([
     { kind: "address", text: "Shenzhen, China" },
     {
@@ -58,7 +59,7 @@ test("renders complete footer contacts as ordered semantic icon rows", () => {
   }
 });
 
-test("renders an address-only contact without a link", () => {
+void test("renders an address-only contact without a link", () => {
   const markup = renderContactList([
     { kind: "address", text: "Shenzhen, China" },
   ]);
@@ -69,7 +70,7 @@ test("renders an address-only contact without a link", () => {
   assert.equal(getTags(markup, "svg").length, 1);
 });
 
-test("renders no contact rows, links, or icons for an empty list", () => {
+void test("renders no contact rows, links, or icons for an empty list", () => {
   const markup = renderContactList([]);
 
   assert.match(markup, /^<address class="contact">/);

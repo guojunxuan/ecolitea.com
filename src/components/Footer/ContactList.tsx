@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import type { FooterContactItem } from "./contact";
+
 import { footerContactIcons } from "./contactIcons";
 
 type FooterContactListProps = {

@@ -1,6 +1,5 @@
-import type { ComponentType } from "react";
-
 import type { Footer } from "@root/payload-types";
+import type { ComponentType } from "react";
 
 import {
   FooterFacebookIcon,
@@ -15,6 +14,7 @@ type FooterSocialPlatform = NonNullable<
   Footer["socialLinks"]
 >[number]["platform"];
 
+/* eslint-disable perfectionist/sort-objects -- CMS platform order is a tested runtime contract. */
 export const footerSocialIcons = {
   facebook: FooterFacebookIcon,
   instagram: FooterInstagramIcon,
@@ -23,3 +23,4 @@ export const footerSocialIcons = {
   x: FooterXIcon,
   tiktok: FooterTikTokIcon,
 } as const satisfies Record<FooterSocialPlatform, ComponentType>;
+/* eslint-enable perfectionist/sort-objects */
