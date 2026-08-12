@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
 import link from '../fields/link'
+import { validateMainMenuTabs } from './mainMenuValidation'
 
 export const MainMenu: GlobalConfig = {
   slug: 'main-menu',
@@ -131,7 +132,16 @@ export const MainMenu: GlobalConfig = {
                     {
                       name: 'tag',
                       type: 'text',
+                      required: true,
                     },
+                    link({
+                      appearances: false,
+                      disableLabel: true,
+                      overrides: {
+                        name: 'landingLink',
+                        label: 'Landing Link',
+                      },
+                    }),
                     {
                       name: 'label',
                       type: 'richText',
@@ -160,7 +170,16 @@ export const MainMenu: GlobalConfig = {
                     {
                       name: 'tag',
                       type: 'text',
+                      required: true,
                     },
+                    link({
+                      appearances: false,
+                      disableLabel: true,
+                      overrides: {
+                        name: 'landingLink',
+                        label: 'Landing Link',
+                      },
+                    }),
                     {
                       name: 'links',
                       type: 'array',
@@ -182,6 +201,7 @@ export const MainMenu: GlobalConfig = {
         },
       ],
       label: 'Main Menu Items',
+      validate: validateMainMenuTabs,
     },
     link({
       appearances: false,

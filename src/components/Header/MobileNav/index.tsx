@@ -12,19 +12,44 @@ import * as React from "react";
 
 import { FullLogo } from "../../../graphics/FullLogo/index";
 import { MenuIcon } from "../../../graphics/MenuIcon/index";
-import { CMSLink } from "../../CMSLink/index";
+import { CMSLink, type CMSLinkType } from "../../CMSLink/index";
 import classes from "./index.module.scss";
-import { getMobileNavigationAction } from "./navigation.js";
+import {
+  getMobileNavigationAction,
+  getMobileNavigationBranch,
+  getMobileNavigationFocusTarget,
+  initialMobileNavigationState,
+  reduceMobileNavigation,
+} from "./navigation.js";
 
 export const modalSlug = "mobile-nav";
 
 type NavItems = Pick<MainMenu, "tabs">;
+type NavigationTab = NonNullable<MainMenu["tabs"]>[number];
+type LinkActivationHandler = NonNullable<CMSLinkType["onClick"]>;
+type NavigationLevel = 1 | 2 | 3;
+type NavigationState = {
+  activeItemIndex: number | undefined;
+  activeTabIndex: number | undefined;
+  level: NavigationLevel;
+};
+type NavigationAction =
+  | { index: number; type: "OPEN_ITEM" | "OPEN_TAB" }
+  | { type: "BACK" | "RESET" };
+type NavigationBranch = {
+  featuredLabel?: NonNullable<
+    NonNullable<NavigationTab["navItems"]>[number]["featuredLink"]
+  >["label"];
+  kind: "featured" | "list";
+  label: string;
+  landingLink?: CMSLinkType;
+  links: Array<{ id?: null | string; link: CMSLinkType }>;
+};
+type ArrowReference = (element: HTMLButtonElement | null) => void;
 
 const PanelHeader: React.FC<{
   onClose: () => void;
-  onLinkActivate: (
-    event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
-  ) => void;
+  onLinkActivate: LinkActivationHandler;
 }> = ({ onClose, onLinkActivate }) => {
   return (
     <div className={classes.panelHeader}>
@@ -50,114 +75,322 @@ const PanelHeader: React.FC<{
   );
 };
 
-const MobileNavItems = ({
-  onLinkActivate,
-  setActiveTab,
-  submenuTriggerIndexRef,
-  submenuTriggerRef,
-  tabs,
-}) => {
-  const handleSubmenuClick = (event, index) => {
-    submenuTriggerIndexRef.current = index;
-    submenuTriggerRef.current = event.currentTarget;
-    setActiveTab(index);
-  };
+const FinalLink: React.FC<{
+  description?: null | string;
+  link?: CMSLinkType;
+  onLinkActivate: LinkActivationHandler;
+  title?: null | string;
+}> = ({ description, link, onLinkActivate, title }) => {
+  const finalTitle = title ?? link?.label;
 
   return (
-    <ul className={classes.mobileMenuItems}>
-      {(tabs || []).map((tab, index) => {
-        const { label, link } = tab;
-        const action = getMobileNavigationAction(tab);
+    <li className={classes.finalLinkItem}>
+      <CMSLink
+        {...link}
+        className={classes.finalLink}
+        label={description ? undefined : finalTitle}
+        onClick={onLinkActivate}
+      >
+        {description && (
+          <span className={classes.finalLinkCopy}>
+            <span className={classes.finalLinkTitle}>{finalTitle}</span>
+            <span className={classes.itemDescription}>{description}</span>
+          </span>
+        )}
+      </CMSLink>
+    </li>
+  );
+};
 
-        if (action === "link") {
-          return (
-            <li className={classes.mobileMenuListItem} key={index}>
-              <CMSLink
-                {...link}
-                className={classes.mobileMenuItem}
-                label={label}
-                onClick={onLinkActivate}
-              />
-            </li>
-          );
-        }
+const DrilldownRow: React.FC<{
+  arrowRef: ArrowReference;
+  label: string;
+  link?: CMSLinkType;
+  onDrilldown: () => void;
+  onLinkActivate: LinkActivationHandler;
+}> = ({ arrowRef, label, link, onDrilldown, onLinkActivate }) => {
+  return (
+    <li className={classes.branchRow}>
+      <CMSLink
+        {...link}
+        className={classes.branchTitle}
+        label={label}
+        onClick={onLinkActivate}
+      />
+      <button
+        aria-label={`Open ${label} submenu`}
+        className={classes.drilldownButton}
+        onClick={onDrilldown}
+        ref={arrowRef}
+        type="button"
+      >
+        <ArrowIcon
+          className={classes.drilldownArrow}
+          rotation={45}
+          size="medium"
+        />
+      </button>
+    </li>
+  );
+};
 
-        return (
-          <li className={classes.mobileMenuListItem} key={index}>
-            <button
-              className={classes.mobileMenuItem}
-              onClick={(event) => handleSubmenuClick(event, index)}
-              ref={(element) => {
-                if (element && submenuTriggerIndexRef.current === index) {
-                  submenuTriggerRef.current = element;
-                }
+const BackRow: React.FC<{
+  arrowRef: ArrowReference;
+  onBack: () => void;
+  onLinkActivate: LinkActivationHandler;
+  parentLabel: string;
+  parentLink?: CMSLinkType;
+}> = ({ arrowRef, onBack, onLinkActivate, parentLabel, parentLink }) => {
+  return (
+    <li className={classes.backRow}>
+      <button
+        aria-label={`Back to ${parentLabel}`}
+        className={classes.backButton}
+        onClick={onBack}
+        ref={arrowRef}
+        type="button"
+      >
+        <ArrowIcon rotation={225} size="medium" />
+      </button>
+      <CMSLink
+        {...parentLink}
+        className={classes.backTitle}
+        onClick={onLinkActivate}
+      >
+        Back to {parentLabel}
+      </CMSLink>
+    </li>
+  );
+};
+
+const NavigationLevels: React.FC<
+  {
+    dispatchNavigation: React.Dispatch<NavigationAction>;
+    isMenuOpen: boolean;
+    navigationState: NavigationState;
+    onLinkActivate: LinkActivationHandler;
+  } & NavItems
+> = ({
+  dispatchNavigation,
+  isMenuOpen,
+  navigationState,
+  onLinkActivate,
+  tabs,
+}) => {
+  const navigationTabs = tabs ?? [];
+  const activeTab = navigationTabs[navigationState.activeTabIndex ?? -1];
+  const activeItem =
+    activeTab?.navItems?.[navigationState.activeItemIndex ?? -1];
+  const activeBranch = getMobileNavigationBranch(
+    activeItem,
+  ) as NavigationBranch | null;
+  const backArrowRefs = React.useRef<
+    Partial<Record<NavigationLevel, HTMLButtonElement | null>>
+  >({});
+  const levelOneArrowRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const levelTwoArrowRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const previousNavigationStateRef = React.useRef(navigationState);
+
+  React.useEffect(() => {
+    const previousNavigationState = previousNavigationStateRef.current;
+    previousNavigationStateRef.current = navigationState;
+
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const focusTarget = getMobileNavigationFocusTarget(
+      previousNavigationState,
+      navigationState,
+    );
+
+    if (!focusTarget) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      if (focusTarget.type === "source") {
+        const sourceRefs =
+          focusTarget.level === 1
+            ? levelOneArrowRefs.current
+            : levelTwoArrowRefs.current;
+        sourceRefs[focusTarget.index]?.focus();
+        return;
+      }
+
+      backArrowRefs.current[focusTarget.level]?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [isMenuOpen, navigationState]);
+
+  const handleBack = React.useCallback(() => {
+    dispatchNavigation({ type: "BACK" });
+  }, [dispatchNavigation]);
+
+  return (
+    <div className={classes.navigationViewport}>
+      <div
+        className={classes.navigationTrack}
+        data-level={navigationState.level}
+      >
+        <section
+          aria-hidden={navigationState.level !== 1}
+          className={classes.levelOnePanel}
+          data-level="1"
+          inert={navigationState.level !== 1}
+        >
+          <ul className={classes.mobileMenuItems}>
+            {navigationTabs.map((tab, tabIndex) => {
+              if (
+                getMobileNavigationAction({
+                  enableDropdown: tab.enableDropdown,
+                }) === "link"
+              ) {
+                return (
+                  <FinalLink
+                    key={tab.id ?? tabIndex}
+                    link={tab.link}
+                    onLinkActivate={onLinkActivate}
+                    title={tab.label}
+                  />
+                );
+              }
+
+              return (
+                <DrilldownRow
+                  arrowRef={(element) => {
+                    levelOneArrowRefs.current[tabIndex] = element;
+                  }}
+                  key={tab.id ?? tabIndex}
+                  label={tab.label}
+                  link={tab.link}
+                  onDrilldown={() =>
+                    dispatchNavigation({ type: "OPEN_TAB", index: tabIndex })
+                  }
+                  onLinkActivate={onLinkActivate}
+                />
+              );
+            })}
+          </ul>
+        </section>
+
+        <section
+          aria-hidden={navigationState.level !== 2}
+          className={classes.levelTwoPanel}
+          data-level="2"
+          inert={navigationState.level !== 2}
+        >
+          <ul className={classes.mobileMenuItems}>
+            <BackRow
+              arrowRef={(element) => {
+                backArrowRefs.current[2] = element;
               }}
-              type="button"
-            >
-              <span>{label}</span>
-              <ArrowIcon rotation={45} size="medium" />
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+              onBack={handleBack}
+              onLinkActivate={onLinkActivate}
+              parentLabel="Main menu"
+              parentLink={{ url: "/" }}
+            />
+            {activeTab?.descriptionLinks?.map((descriptionLink, linkIndex) => (
+              <FinalLink
+                key={descriptionLink.id ?? linkIndex}
+                link={descriptionLink.link}
+                onLinkActivate={onLinkActivate}
+              />
+            ))}
+            {activeTab?.navItems?.map((item, itemIndex) => {
+              if (item.style === "default" && item.defaultLink) {
+                return (
+                  <FinalLink
+                    description={item.defaultLink.description}
+                    key={item.id ?? itemIndex}
+                    link={item.defaultLink.link}
+                    onLinkActivate={onLinkActivate}
+                  />
+                );
+              }
+
+              const branch = getMobileNavigationBranch(
+                item,
+              ) as NavigationBranch | null;
+
+              if (!branch) {
+                return null;
+              }
+
+              return (
+                <DrilldownRow
+                  arrowRef={(element) => {
+                    levelTwoArrowRefs.current[itemIndex] = element;
+                  }}
+                  key={item.id ?? itemIndex}
+                  label={branch.label}
+                  link={branch.landingLink}
+                  onDrilldown={() =>
+                    dispatchNavigation({ type: "OPEN_ITEM", index: itemIndex })
+                  }
+                  onLinkActivate={onLinkActivate}
+                />
+              );
+            })}
+          </ul>
+        </section>
+
+        <section
+          aria-hidden={navigationState.level !== 3}
+          className={classes.levelThreePanel}
+          data-level="3"
+          inert={navigationState.level !== 3}
+        >
+          <ul className={classes.mobileMenuItems}>
+            <BackRow
+              arrowRef={(element) => {
+                backArrowRefs.current[3] = element;
+              }}
+              onBack={handleBack}
+              onLinkActivate={onLinkActivate}
+              parentLabel={activeTab?.label ?? "Main menu"}
+              parentLink={activeTab?.link}
+            />
+            {activeBranch?.kind === "featured" &&
+              activeBranch.featuredLabel && (
+                <li className={classes.featuredContent}>
+                  <RichText
+                    className={classes.featuredLinkLabel}
+                    content={activeBranch.featuredLabel}
+                  />
+                </li>
+              )}
+            {activeBranch?.links.map((link, linkIndex) => (
+              <FinalLink
+                key={link.id ?? linkIndex}
+                link={link.link}
+                onLinkActivate={onLinkActivate}
+              />
+            ))}
+          </ul>
+        </section>
+      </div>
+    </div>
   );
 };
 
 const MobileMenuModal: React.FC<
   {
-    activeTab: number | undefined;
+    dispatchNavigation: React.Dispatch<NavigationAction>;
     isMenuOpen: boolean;
+    navigationState: NavigationState;
     onClose: () => void;
-    onLinkActivate: (
-      event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
-    ) => void;
-    setActiveTab: React.Dispatch<React.SetStateAction<number | undefined>>;
+    onLinkActivate: LinkActivationHandler;
   } & NavItems
 > = ({
-  activeTab,
+  dispatchNavigation,
   isMenuOpen,
+  navigationState,
   onClose,
   onLinkActivate,
-  setActiveTab,
   tabs,
 }) => {
-  const backButtonRef = React.useRef<HTMLButtonElement>(null);
-  const submenuTriggerIndexRef = React.useRef<number | undefined>(undefined);
-  const submenuTriggerRef = React.useRef<HTMLButtonElement>(null);
-  const shouldRestoreTriggerFocus = React.useRef(false);
-  const activeMenu = (tabs || [])[activeTab ?? -1];
-
-  React.useEffect(() => {
-    if (!isMenuOpen) {
-      shouldRestoreTriggerFocus.current = false;
-
-      return;
-    }
-
-    if (activeMenu) {
-      const frame = window.requestAnimationFrame(() =>
-        backButtonRef.current?.focus(),
-      );
-
-      return () => window.cancelAnimationFrame(frame);
-    }
-
-    if (shouldRestoreTriggerFocus.current && submenuTriggerRef.current) {
-      shouldRestoreTriggerFocus.current = false;
-      const frame = window.requestAnimationFrame(() =>
-        submenuTriggerRef.current?.focus(),
-      );
-
-      return () => window.cancelAnimationFrame(frame);
-    }
-  }, [activeMenu, isMenuOpen]);
-
-  const handleBack = React.useCallback(() => {
-    shouldRestoreTriggerFocus.current = true;
-    setActiveTab(undefined);
-  }, [setActiveTab]);
-
   return (
     <Modal
       className={classes.mobileMenuModal}
@@ -171,134 +404,36 @@ const MobileMenuModal: React.FC<
         onClick={(event) => event.stopPropagation()}
       >
         <PanelHeader onClose={onClose} onLinkActivate={onLinkActivate} />
-        {activeMenu ? (
-          <SubMenuItems
-            backButtonRef={backButtonRef}
-            onBack={handleBack}
-            onLinkActivate={onLinkActivate}
-            tab={activeMenu}
-          />
-        ) : (
-          <MobileNavItems
-            onLinkActivate={onLinkActivate}
-            setActiveTab={setActiveTab}
-            submenuTriggerIndexRef={submenuTriggerIndexRef}
-            submenuTriggerRef={submenuTriggerRef}
-            tabs={tabs}
-          />
-        )}
+        <NavigationLevels
+          dispatchNavigation={dispatchNavigation}
+          isMenuOpen={isMenuOpen}
+          navigationState={navigationState}
+          onLinkActivate={onLinkActivate}
+          tabs={tabs}
+        />
       </div>
     </Modal>
-  );
-};
-
-const SubMenuItems = ({ backButtonRef, onBack, onLinkActivate, tab }) => {
-  return (
-    <div className={classes.subMenuItems}>
-      <button
-        className={classes.backButton}
-        onClick={onBack}
-        ref={backButtonRef}
-        type="button"
-      >
-        <ArrowIcon rotation={225} size="medium" />
-        Back
-      </button>
-      {tab.descriptionLinks && tab.descriptionLinks.length > 0 && (
-        <div className={classes.descriptionLinks}>
-          {tab.descriptionLinks.map((link, linkIndex) => (
-            <CMSLink
-              className={classes.descriptionLink}
-              key={linkIndex}
-              {...link.link}
-              onClick={onLinkActivate}
-            >
-              <ArrowIcon className={classes.linkArrow} />
-            </CMSLink>
-          ))}
-        </div>
-      )}
-      {(tab.navItems || []).map((item, index) => {
-        return (
-          <div className={classes.linkWrap} key={index}>
-            {item.style === "default" && item.defaultLink && (
-              <CMSLink
-                className={classes.defaultLink}
-                {...item.defaultLink.link}
-                label=""
-                onClick={onLinkActivate}
-              >
-                <div className={classes.listLabelWrap}>
-                  <div className={classes.listLabel}>
-                    {item.defaultLink.link.label}
-                    <ArrowIcon rotation={0} size="medium" />
-                  </div>
-                  <div className={classes.itemDescription}>
-                    {item.defaultLink.description}
-                  </div>
-                </div>
-              </CMSLink>
-            )}
-            {item.style === "list" && item.listLinks && (
-              <div className={classes.linkList}>
-                <div className={classes.tag}>{item.listLinks.tag}</div>
-                <div className={classes.listWrap}>
-                  {item.listLinks.links &&
-                    item.listLinks.links.map((link, linkIndex) => (
-                      <CMSLink
-                        className={classes.link}
-                        key={linkIndex}
-                        {...link.link}
-                        onClick={onLinkActivate}
-                      >
-                        {link.link?.newTab && link.link?.type === "custom" && (
-                          <ArrowIcon className={classes.linkArrow} />
-                        )}
-                      </CMSLink>
-                    ))}
-                </div>
-              </div>
-            )}
-            {item.style === "featured" && item.featuredLink && (
-              <div className={classes.featuredLink}>
-                <div className={classes.tag}>{item.featuredLink.tag}</div>
-                {item.featuredLink?.label && (
-                  <RichText
-                    className={classes.featuredLinkLabel}
-                    content={item.featuredLink.label}
-                  />
-                )}
-                <div className={classes.featuredLinkWrap}>
-                  {item.featuredLink.links &&
-                    item.featuredLink.links.map((link, linkIndex) => (
-                      <CMSLink
-                        className={classes.featuredLinks}
-                        key={linkIndex}
-                        {...link.link}
-                        onClick={onLinkActivate}
-                      >
-                        <ArrowIcon />
-                      </CMSLink>
-                    ))}
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 };
 
 export const MobileNav: React.FC<NavItems> = (props) => {
   const { closeAllModals, isModalOpen, openModal } = useModal();
   const pathname = usePathname();
-  const [activeTab, setActiveTab] = React.useState<number | undefined>();
+  const [navigationState, dispatchNavigation] = React.useReducer(
+    reduceMobileNavigation as React.Reducer<NavigationState, NavigationAction>,
+    initialMobileNavigationState as NavigationState,
+  );
 
   const isMenuOpen = isModalOpen(modalSlug);
 
+  React.useEffect(() => {
+    if (!isMenuOpen) {
+      dispatchNavigation({ type: "RESET" });
+    }
+  }, [isMenuOpen]);
+
   const closeMenu = React.useCallback(() => {
-    setActiveTab(undefined);
+    dispatchNavigation({ type: "RESET" });
     closeAllModals();
   }, [closeAllModals]);
 
@@ -324,8 +459,8 @@ export const MobileNav: React.FC<NavItems> = (props) => {
       desktopMediaQuery.removeEventListener("change", closeOnDesktop);
   }, [closeMenu]);
 
-  const handleLinkActivation = React.useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+  const handleLinkActivation = React.useCallback<LinkActivationHandler>(
+    (event) => {
       if (
         event.defaultPrevented ||
         event.button !== 0 ||
@@ -346,7 +481,7 @@ export const MobileNav: React.FC<NavItems> = (props) => {
     if (isMenuOpen) {
       closeMenu();
     } else {
-      setActiveTab(undefined);
+      dispatchNavigation({ type: "RESET" });
       openModal(modalSlug);
     }
   }, [isMenuOpen, closeMenu, openModal]);
@@ -387,11 +522,11 @@ export const MobileNav: React.FC<NavItems> = (props) => {
       </div>
       <MobileMenuModal
         {...props}
-        activeTab={activeTab}
+        dispatchNavigation={dispatchNavigation}
         isMenuOpen={isMenuOpen}
+        navigationState={navigationState}
         onClose={closeMenu}
         onLinkActivate={handleLinkActivation}
-        setActiveTab={setActiveTab}
       />
     </div>
   );

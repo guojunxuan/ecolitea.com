@@ -4005,7 +4005,26 @@ export interface MainMenu {
                 description?: string | null;
               };
               featuredLink?: {
-                tag?: string | null;
+                tag: string;
+                landingLink?: {
+                  type?: ('reference' | 'custom') | null;
+                  newTab?: boolean | null;
+                  reference?:
+                    | ({
+                        relationTo: 'pages';
+                        value: string | Page;
+                      } | null)
+                    | ({
+                        relationTo: 'posts';
+                        value: string | Post;
+                      } | null)
+                    | ({
+                        relationTo: 'case-studies';
+                        value: string | CaseStudy;
+                      } | null);
+                  url?: string | null;
+                  customId?: string | null;
+                };
                 label?: {
                   root: {
                     type: string;
@@ -4048,7 +4067,26 @@ export interface MainMenu {
                   | null;
               };
               listLinks?: {
-                tag?: string | null;
+                tag: string;
+                landingLink?: {
+                  type?: ('reference' | 'custom') | null;
+                  newTab?: boolean | null;
+                  reference?:
+                    | ({
+                        relationTo: 'pages';
+                        value: string | Page;
+                      } | null)
+                    | ({
+                        relationTo: 'posts';
+                        value: string | Post;
+                      } | null)
+                    | ({
+                        relationTo: 'case-studies';
+                        value: string | CaseStudy;
+                      } | null);
+                  url?: string | null;
+                  customId?: string | null;
+                };
                 links?:
                   | {
                       link: {
@@ -4477,6 +4515,15 @@ export interface MainMenuSelect<T extends boolean = true> {
                 | T
                 | {
                     tag?: T;
+                    landingLink?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          customId?: T;
+                        };
                     label?: T;
                     links?:
                       | T
@@ -4498,6 +4545,15 @@ export interface MainMenuSelect<T extends boolean = true> {
                 | T
                 | {
                     tag?: T;
+                    landingLink?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          customId?: T;
+                        };
                     links?:
                       | T
                       | {
