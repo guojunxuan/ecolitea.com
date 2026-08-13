@@ -85,6 +85,8 @@ Development branches do not need a Git tag. Push the branch to GitHub, then open
 
 The CI workflow checks out the selected branch, installs the locked dependencies, runs the complete automated test suite, type-checks the project, and runs the production build against a disposable CI MongoDB service. It has read-only repository permissions and cannot create a Git tag, container image, package, GitHub Release, or production database change. Keep the workflow on the development branch until these checks pass, then open the pull request to `main`.
 
+While this `ci.yml` is not yet available from the default branch, run **Actions → Release Ecolitea → Run workflow** on the development branch and leave the optional `version` field empty. The same validation runs, and the publishing job is marked as skipped.
+
 ## Environment Configuration
 
 Keep environment values in `.env` locally and on the server. Use placeholders rather than live credentials in documentation or deployment manifests; do not commit `.env`.
@@ -214,9 +216,11 @@ Keep the previously deployed immutable `IMAGE_TAG`. To roll back, set it again i
 
 ## Release Images
 
-After the feature pull request is merged, run **Actions → CI Ecolitea → Run workflow** on `main`. Only after that run succeeds, start **Actions → Release Ecolitea → Run workflow** from `main` and enter a new semantic version such as `v1.1.0`.
+The **Release Ecolitea** workflow has an optional `version` field. Leave it empty to run tests, type-checking, and the production build on the selected branch; the Tag, GHCR, and GitHub Release job is skipped. This validation-only mode is safe for development branches and `main`.
 
-The release workflow rejects non-`main` runs, malformed versions, and versions whose Git tags already exist. It then runs the complete tests, type-check, production build, and a non-publishing container build against a disposable CI MongoDB service. Only after every check succeeds does it create and push the annotated Git tag, rebuild and push the version, commit-SHA, and `latest` image tags to GHCR, and create a GitHub Release with generated notes.
+After the feature pull request is merged, run the workflow on `main` with the version empty. Only after that validation succeeds, run it again from `main` and enter a new semantic version such as `v1.1.0`.
+
+When a version is supplied, the workflow rejects non-`main` runs, malformed versions, and versions whose Git tags already exist. It then runs the complete tests, type-check, production build, and a non-publishing container build against a disposable CI MongoDB service. Only after every check succeeds does it create and push the annotated Git tag, rebuild and push the version, commit-SHA, and `latest` image tags to GHCR, and create a GitHub Release with generated notes.
 
 The release workflow never connects to, migrates, or otherwise changes production MongoDB data. If validation fails, it creates no Git tag, container package, or GitHub Release. The workflow sends no external notification.
 

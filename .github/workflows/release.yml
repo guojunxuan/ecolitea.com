@@ -4,21 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: New semantic version to create, for example v1.1.0
-        required: true
+        description: Optional new semantic version, for example v1.1.0 (leave blank for validation only)
+        required: false
+        default: ""
         type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release
+  group: validate-or-release-${{ inputs.version || github.ref }}
   cancel-in-progress: false
 
 jobs:
   checks:
-    name: Validate main for release
-    if: ${{ github.ref == 'refs/heads/main' }}
+    name: Test, type-check, and build
     runs-on: ubuntu-latest
 
     services:
@@ -57,13 +57,19 @@ jobs:
       GA_USE_DEMO_DATA: "false"
 
     steps:
-      - name: Check out main
+      - name: Check out the selected branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Validate the new version
+        if: ${{ inputs.version != '' }}
         run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "A version can only be released from main: $GITHUB_REF" >&2
+            exit 1
+          fi
+
           if [[ ! "$RELEASE_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Version must use semantic format such as v1.1.0: $RELEASE_VERSION" >&2
             exit 1
@@ -98,9 +104,11 @@ jobs:
         run: corepack pnpm@9.15.4 build:skipDocs
 
       - name: Set up Docker Buildx
+        if: ${{ inputs.version != '' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Validate the container image build
+        if: ${{ inputs.version != '' }}
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -119,6 +127,7 @@ jobs:
 
   publish:
     name: Tag, publish image, and create release
+    if: ${{ inputs.version != '' && github.ref == 'refs/heads/main' }}
     needs: checks
     runs-on: ubuntu-latest
     permissions:
