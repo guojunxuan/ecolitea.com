@@ -12,7 +12,7 @@ Ecolitea is a CMS-driven website built on a tailored Payload implementation. Its
 
 ## Current Branch: Site Navigation Redesign
 
-The `codex/site-navigation-redesign` branch streamlines the original Payload website into the Ecolitea site and delivers the following system changes:
+The `chore/site-navigation-redesign` branch streamlines the original Payload website into the Ecolitea site and delivers the following system changes:
 
 - **Focused application scope** — Removes the inherited Payload Cloud account, billing, deployment, and documentation experiences so the repository serves the Ecolitea website and CMS.
 - **CMS-driven navigation** — Provides a responsive desktop navigation system and a mobile menu with three-level drill-down navigation, parent links, back navigation, and accessible controls.
