@@ -461,7 +461,7 @@ export const DesktopNav: React.FC<DesktopNavType> = ({ hideBackground, menuCta, 
       >
         <div className={classes.grid}>
           <div className={classes.logo}>
-            <Link aria-label="Full Payload Logo" className={classes.logo} href="/" prefetch={false}>
+            <Link aria-label="Go to Ecolitea homepage" className={classes.logo} href="/" prefetch={false}>
               <FullLogo className="w-auto h-[30px]" />
             </Link>
           </div>

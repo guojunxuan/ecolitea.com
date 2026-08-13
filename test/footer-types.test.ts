@@ -15,10 +15,8 @@ type SocialLink = NonNullable<Footer["socialLinks"]>[number];
 
 type FooterSchemaContract = [
   Expect<HasKey<Footer, "columns">>,
-  Expect<IsEqual<keyof Brand, "logo" | "logoAlt" | "tagline">>,
-  Expect<IsRequired<Brand, "logo">>,
-  Expect<IsRequired<Brand, "logoAlt">>,
-  Expect<IsRequired<Brand, "tagline">>,
+  Expect<IsEqual<keyof Brand, "description">>,
+  Expect<IsRequired<Brand, "description">>,
   Expect<
     IsEqual<keyof Newsletter, "heading" | "description" | "emailPlaceholder">
   >,

@@ -3865,9 +3865,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Footer {
   id: string;
   brand: {
-    logo: string | Media;
-    logoAlt: string;
-    tagline: string;
+    description: string;
   };
   socialLinks?:
     | {
@@ -4404,9 +4402,7 @@ export interface FooterSelect<T extends boolean = true> {
   brand?:
     | T
     | {
-        logo?: T;
-        logoAlt?: T;
-        tagline?: T;
+        description?: T;
       };
   socialLinks?:
     | T

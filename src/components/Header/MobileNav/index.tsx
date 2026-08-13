@@ -62,7 +62,7 @@ const PanelHeader: React.FC<{
         <MenuIcon />
       </button>
       <Link
-        aria-label="Full Payload Logo"
+        aria-label="Go to Ecolitea homepage"
         className={classes.logo}
         href="/"
         onClick={onLinkActivate}
@@ -504,7 +504,7 @@ export const MobileNav: React.FC<NavItems> = (props) => {
             <MenuIcon />
           </button>
           <Link
-            aria-label="Full Payload Logo"
+            aria-label="Go to Ecolitea homepage"
             className={classes.logo}
             href="/"
             prefetch={false}

@@ -46,7 +46,7 @@ test("uses the approved centered desktop proportions and dynamic navigation colu
 });
 
 test("uses the approved footer navigation typography hierarchy", () => {
-  const tagline = getBlock(stylesheet, ".tagline");
+  const description = getBlock(stylesheet, ".description");
   const heading = getBlock(stylesheet, ".navigationHeading");
   const navigationLink = getBlock(stylesheet, "\n.navigationLink {");
   const newsletter = getBlock(stylesheet, "\n.newsletter {");
@@ -54,7 +54,7 @@ test("uses the approved footer navigation typography hierarchy", () => {
   const contact = getBlock(stylesheet, ".contact");
   const copyright = getBlock(stylesheet, ".copyright");
 
-  assert.match(tagline, /font-size:\s*12px\s*;/);
+  assert.match(description, /font-size:\s*12px\s*;/);
   assert.match(
     stylesheet,
     /\.navigationHeading,\s*\.mobileNavigationHeading,\s*\.newsletter h2\s*{/,

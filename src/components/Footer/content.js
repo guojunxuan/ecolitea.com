@@ -42,19 +42,6 @@ export const normalizeFooterRows = (value) => {
   }
 };
 
-export const getFooterLogoResource = (resource, footerAlt) => {
-  if (!isObjectRecord(resource)) return null;
-
-  try {
-    return {
-      ...resource,
-      alt: getPopulatedText(footerAlt),
-    };
-  } catch {
-    return null;
-  }
-};
-
 export const isSafeFooterSocialURL = (value) => {
   const url = getPopulatedText(value);
   if (!url) return false;

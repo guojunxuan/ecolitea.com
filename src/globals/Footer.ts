@@ -32,18 +32,7 @@ export const Footer: GlobalConfig = {
       type: "group",
       fields: [
         {
-          name: "logo",
-          type: "upload",
-          relationTo: "media",
-          required: true,
-        },
-        {
-          name: "logoAlt",
-          type: "text",
-          required: true,
-        },
-        {
-          name: "tagline",
+          name: "description",
           type: "textarea",
           required: true,
         },

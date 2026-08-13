@@ -93,6 +93,11 @@ test("renders exactly two plain full logos without prop overrides", () => {
   ]);
 });
 
+test("names both mobile logo links for the Ecolitea homepage", () => {
+  assert.equal(mobileNav.match(/aria-label="Go to Ecolitea homepage"/g)?.length, 2);
+  assert.doesNotMatch(mobileNav, /Payload Logo/);
+});
+
 test("renders the approved plain mobile action icon components", () => {
   const panelCloseButton = getButton(mobileNav, "panel close", [
     /aria-label="Close menu"/,

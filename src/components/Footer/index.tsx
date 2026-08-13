@@ -4,15 +4,15 @@ import type { Footer as FooterType } from "@types";
 
 import { CMSLink } from "@components/CMSLink/index";
 import { Gutter } from "@components/Gutter/index";
-import { Media } from "@components/Media/index";
+import { FullLogo } from "@root/graphics/FullLogo/index";
 import { getFooterSocialPlatformLabel } from "@root/globals/footerSocials.js";
+import Link from "next/link";
 import React, { useId, useState } from "react";
 
 import { getFooterContactItems } from "./contact.js";
 import { FooterContactList } from "./ContactList";
 import {
   getFooterCopyright,
-  getFooterLogoResource,
   getSafeFooterLink,
   isSafeFooterSocialURL,
   normalizeFooterRows,
@@ -46,7 +46,6 @@ export const Footer: React.FC<FooterType> = (props) => {
   const [openColumnID, setOpenColumnID] = useState<null | string>(null);
   const accordionID = useId();
   const currentYear = new Date().getUTCFullYear();
-  const logoResource = getFooterLogoResource(brand?.logo, brand?.logoAlt);
 
   return (
     <footer className={classes.footer} data-theme="dark">
@@ -54,16 +53,17 @@ export const Footer: React.FC<FooterType> = (props) => {
         <div className={classes.container}>
           <div className={classes.content}>
             <section className={classes.brand}>
-              {logoResource ? (
-                <Media
-                  alt={brand?.logoAlt || ""}
-                  className={classes.logo}
-                  resource={logoResource}
-                />
-              ) : null}
+              <Link
+                aria-label="Go to Ecolitea homepage"
+                className={classes.logo}
+                href="/"
+                prefetch={false}
+              >
+                <FullLogo />
+              </Link>
 
-              {typeof brand?.tagline === "string" && brand.tagline.trim() ? (
-                <p className={classes.tagline}>{brand.tagline}</p>
+              {typeof brand?.description === "string" && brand.description.trim() ? (
+                <p className={classes.description}>{brand.description}</p>
               ) : null}
 
               <ul aria-label="Social media" className={classes.socialLinks}>

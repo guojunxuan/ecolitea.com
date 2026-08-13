@@ -4,7 +4,6 @@ import test from "node:test";
 import {
   getFooterCopyright,
   getFooterEmailHref,
-  getFooterLogoResource,
   getFooterPhoneHref,
   getSafeFooterLink,
   isSafeFooterSocialURL,
@@ -32,25 +31,6 @@ test("normalizes footer rows to populated object records", () => {
     ]),
     [column, socialLink],
   );
-});
-
-test("clones a populated footer logo with the Footer-specific alt text", () => {
-  const resource = {
-    alt: "Media library alt",
-    id: "logo",
-    url: "/logo.svg",
-  };
-  const result = getFooterLogoResource(resource, "Footer logo alt");
-
-  assert.deepEqual(result, {
-    alt: "Footer logo alt",
-    id: "logo",
-    url: "/logo.svg",
-  });
-  assert.notEqual(result, resource);
-  assert.equal(getFooterLogoResource("logo-id", "Footer logo alt"), null);
-  assert.equal(getFooterLogoResource(null, "Footer logo alt"), null);
-  assert.equal(getFooterLogoResource([], "Footer logo alt"), null);
 });
 
 test("accepts only valid HTTPS footer social URLs", () => {
