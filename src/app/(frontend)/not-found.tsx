@@ -9,18 +9,15 @@ import React from 'react'
 export default async function NotFound() {
   const { isEnabled: draft } = await draftMode()
 
-  const getGlobals = draft
-    ? fetchGlobals
-    : unstable_cache(fetchGlobals, ['globals', 'mainMenu', 'footer'])
+  const getGlobals = draft ? fetchGlobals : unstable_cache(fetchGlobals, ['globals', 'mainMenu', 'footer'])
 
-  const { footer, mainMenu } = await getGlobals()
+  const { footer, mainMenu, topBar } = await getGlobals()
 
   return (
     <React.Fragment>
-      <Header {...mainMenu} />
+      <Header {...mainMenu} topBar={topBar} />
       <div>
         <ErrorMessage />
-        <div id="docsearch" />
         <Footer {...footer} />
       </div>
     </React.Fragment>

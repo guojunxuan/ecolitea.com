@@ -1,6 +1,5 @@
 import type { CollectionConfig } from 'payload'
 
-import { addToDocs } from '@root/fields/addToDocs'
 import { revalidatePath } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
@@ -129,8 +128,7 @@ export const Posts: CollectionConfig = {
       name: 'thumbnail',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) =>
-          !siblingData?.dynamicThumbnail && siblingData?.featuredMedia !== 'upload',
+        condition: (_, siblingData) => !siblingData?.dynamicThumbnail && siblingData?.featuredMedia !== 'upload',
       },
       relationTo: 'media',
       required: true,
@@ -202,14 +200,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'content',
       type: 'blocks',
-      blockReferences: [
-        Banner,
-        'blogContent',
-        'code',
-        'blogMarkdown',
-        'mediaBlock',
-        'reusableContentBlock',
-      ],
+      blockReferences: [Banner, 'blogContent', 'code', 'blogMarkdown', 'mediaBlock', 'reusableContentBlock'],
       blocks: [],
       required: true,
     },
@@ -225,47 +216,6 @@ export const Posts: CollectionConfig = {
       },
       hasMany: true,
       relationTo: 'posts',
-    },
-    {
-      name: 'relatedDocs',
-      type: 'relationship',
-      admin: {
-        description:
-          'Select the docs where you want to link to this guide. Be sure to select the correct version.',
-      },
-      hasMany: true,
-      hooks: {
-        afterChange: [
-          ({ req, value }) => {
-            try {
-              if (!Array.isArray(value)) {
-                return
-              }
-
-              value.forEach(async (docID) => {
-                const doc = await req.payload.findByID({
-                  id: docID,
-                  collection: 'docs',
-                  select: {
-                    slug: true,
-                    topic: true,
-                  },
-                })
-
-                if (!doc) {
-                  throw new Error('Doc not found')
-                } else {
-                  revalidatePath(`/docs/${doc.topic}/${doc.slug}`)
-                  console.log(`Revalidated: /docs/${doc.topic}/${doc.slug}`)
-                }
-              })
-            } catch (error) {
-              console.error(error)
-            }
-          },
-        ],
-      },
-      relationTo: 'docs',
     },
     slugField(),
     {
@@ -344,7 +294,6 @@ export const Posts: CollectionConfig = {
       },
       required: true,
     },
-    addToDocs,
   ],
   forceSelect: {
     relatedPosts: true,

@@ -84,7 +84,12 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .grid {
+  display: grid;
   height: 100%;
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  grid-template-columns: 19% minmax(0, 1fr) max-content;
 
   :local(a) {
     text-decoration: none;
@@ -95,6 +100,8 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   display: flex;
   position: relative;
   width: 100%;
+  min-width: 0;
+  padding-inline-end: clamp(1.5rem, 2vw, 2rem);
 }
 
 .authNav {
@@ -116,7 +123,7 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   align-items: center;
 
   svg {
-    height: 1.25rem;
+    height: 39px;
     width: auto;
   }
 }
@@ -127,7 +134,26 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   flex-grow: 1;
   display: flex;
   flex-direction: row;
-  gap: 1.5rem;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: clamp(0.5rem, 1.2vw, 1.25rem);
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.interactionBoundary {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.tabWrap,
+.more {
+  display: flex;
+  height: 100%;
+  flex: 0 0 auto;
 }
 
 .tab {
@@ -135,6 +161,64 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   cursor: pointer;
   height: 100%;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.more {
+  position: relative;
+}
+
+.moreMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  margin: 0;
+  min-width: max-content;
+  padding: 0.75rem;
+  flex-direction: column;
+  list-style: none;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border-color);
+}
+
+.moreMenuItem {
+  @include btnReset;
+  display: flex;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    opacity: 0.8;
+    text-decoration: none;
+  }
+}
+
+.measurementRow {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  width: max-content;
+  height: 0;
+  overflow: hidden;
+  align-items: center;
+  gap: clamp(0.5rem, 1.2vw, 1.25rem);
+  white-space: nowrap;
+}
+
+.measurementItem {
+  @include btnReset;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .directLink {
@@ -181,6 +265,7 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
 
 .dropdown {
   position: fixed;
+  top: calc(var(--top-bar-height) + var(--header-height));
   left: 0;
   width: 100%;
   pointer-events: none;
@@ -385,14 +470,6 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   visibility: visible;
 }
 
-.payload {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
 .button {
   display: flex;
   align-items: center;
@@ -417,17 +494,12 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   }
 }
 
-.github {
+.searchButton {
+  @include btnReset;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  svg {
-    width: 1.25rem;
-  }
-
-  &:hover {
-    opacity: 0.8;
-  }
+  color: var(--theme-elevation-900);
+  cursor: pointer;
 }
 
 [data-theme='dark'] {

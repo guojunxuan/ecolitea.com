@@ -5,46 +5,18 @@ import type { DefaultNodeTypes, SerializedBlockNode } from '@payloadcms/richtext
 import type { SerializedLexicalNode } from '@payloadcms/richtext-lexical/lexical'
 import type { SerializedLabelNode } from '@root/fields/richText/features/label/LabelNode'
 import type { SerializedLargeBodyNode } from '@root/fields/richText/features/largeBody/LargeBodyNode'
-import type {
-  ArrowBlock,
-  BannerBlock,
-  BrBlock,
-  BulletListBlock,
-  CardBlock,
-  CardGroupBlock,
-  CodeBlock,
-  CommandLineBlock,
-  Doc,
-  DownloadBlockType,
-  LightDarkImageBlock,
-  PayloadMediaBlock as PayloadMediaBlockType,
-  PillBlock,
-  ResourceBlock,
-  RestExamplesBlock,
-  SpotlightBlock,
-  TableWithDrawersBlock,
-  TemplateCardsBlock,
-  UploadBlock,
-  VideoBlock,
-  VideoDrawerBlock,
-  YoutubeBlock,
-} from '@types'
+import type { BrBlock, CommandLineBlock, DownloadBlockType, SpotlightBlock, VideoBlock } from '@types'
 
-import { Banner } from '@components/Banner'
 import { CMSLink } from '@components/CMSLink'
-import Code from '@components/Code/index'
 import { CommandLine } from '@components/CommandLine'
 import { Label } from '@components/Label'
 import { LargeBody } from '@components/LargeBody'
 import RichTextUpload from '@components/RichText/Upload'
 import { Video } from '@components/RichText/Video'
 import SpotlightAnimation from '@components/SpotlightAnimation'
-import { TemplateCards } from '@components/TemplateCardsBlock'
-import YouTube from '@components/YouTube/index'
 
 import './index.scss'
 
-import { useLivePreview } from '@payloadcms/live-preview-react'
 import {
   type JSXConverters,
   type JSXConvertersFunction,
@@ -52,25 +24,10 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 import { Download } from '@root/components/blocks/Download'
 import { getVideo } from '@root/utilities/get-video'
-import React, { useCallback, useMemo, useState } from 'react'
+import React from 'react'
 
 import type { AllowedElements } from '../SpotlightAnimation/types'
-
-import { Arrow } from './Arrow'
-import { BulletList } from './BulletList'
-import { Card } from './Card/index'
-import { CardGroup } from './CardGroup/index'
-import { type AddHeading, type Heading, type IContext, RichTextContext } from './context'
-import { Heading as HeadingComponent } from './Heading'
-import { LightDarkImage } from './LightDarkImage/index'
-import { PayloadMediaBlock } from './PayloadMedia'
-import { Pill } from './Pill'
-import { ResourceBlock as Resource } from './ResourceBlock'
-import { RestExamples } from './RestExamples'
 import { CustomTableJSXConverters } from './Table/index'
-import { TableWithDrawers } from './TableWithDrawers'
-import { UploadBlockImage } from './UploadBlock/index'
-import { VideoDrawer } from './VideoDrawer'
 
 type Props = {
   className?: string
@@ -79,239 +36,68 @@ type Props = {
 
 export type NodeTypes =
   | DefaultNodeTypes
-  | SerializedBlockNode<
-      | ArrowBlock
-      | BannerBlock
-      | BrBlock
-      | BulletListBlock
-      | CardBlock
-      | CardGroupBlock
-      | CodeBlock
-      | CommandLineBlock
-      | DownloadBlockType
-      | LightDarkImageBlock
-      | PayloadMediaBlockType
-      | PillBlock
-      | ResourceBlock
-      | RestExamplesBlock
-      | SpotlightBlock
-      | TableWithDrawersBlock
-      | TemplateCardsBlock
-      | UploadBlock
-      | VideoBlock
-      | VideoDrawerBlock
-      | YoutubeBlock
-    >
+  | SerializedBlockNode<BrBlock | CommandLineBlock | DownloadBlockType | SpotlightBlock | VideoBlock>
   | SerializedLabelNode
   | SerializedLargeBodyNode
 
-export const jsxConverters: (args: { toc?: boolean }) => JSXConvertersFunction<NodeTypes> =
-  ({ toc }) =>
-  ({ defaultConverters }) => {
-    const converters: JSXConverters<NodeTypes> = {
-      ...defaultConverters,
-      ...CustomTableJSXConverters,
-      blocks: {
-        Arrow: ({ node }) => {
-          return <Arrow direction={node.fields.direction} />
-        },
-        Banner: ({ node }) => {
-          return <Banner content={node.fields.content} type={node.fields.type} />
-        },
-        br: () => <br />,
-        BulletList: ({ node }) => {
-          return <BulletList items={node.fields.items} />
-        },
-        Card: ({ node }) => {
-          return (
-            <Card
-              description={node.fields.description}
-              link={node.fields.link}
-              title={node.fields.title}
-            />
-          )
-        },
-        CardGroup: ({ node, nodesToJSX }) => {
-          const Children = nodesToJSX({
-            nodes: node.fields.content?.root?.children as SerializedLexicalNode[],
-          })
-          return <CardGroup>{Children}</CardGroup>
-        },
-        Code: ({ node }) => {
-          const codeString: string = node.fields.code ?? ''
-          return (
-            <Code
-              children={codeString?.trim()}
-              disableMinHeight
-              language={node.fields.language ?? undefined}
-              parentClassName={'lexical-code'}
-            />
-          )
-        },
-        commandLine: ({ node }) => {
-          const { command } = node.fields
-          if (command) {
-            return <CommandLine command={command} lexical />
-          }
-          return null
-        },
-        downloadBlock: ({ node }) => {
-          return <Download {...node.fields} />
-        },
-        LightDarkImage: ({ node }) => {
-          return (
-            <LightDarkImage
-              alt={node.fields.alt ?? ''}
-              caption={node.fields.caption ?? ''}
-              srcDark={node.fields.srcDark ?? undefined}
-              srcLight={node.fields.srcLight ?? undefined}
-            />
-          )
-        },
-        PayloadMedia: ({ node }) => {
-          return <PayloadMediaBlock {...node.fields} />
-        },
-        Pill: ({ node }) => {
-          return <Pill text={node.fields.text} />
-        },
-        Resource: ({ node }) => {
-          if (!node.fields.post) {
-            return null
-          }
-
-          return <Resource id={node.fields.post} />
-        },
-        RestExamples: ({ node }) => {
-          return <RestExamples data={node.fields.data} />
-        },
-        spotlight: ({ node, nodesToJSX }) => {
-          const { element, richText } = node.fields
-
-          const as: AllowedElements = (element as AllowedElements) ?? 'h2'
-
-          const Children = nodesToJSX({
-            nodes: richText?.root?.children as SerializedLexicalNode[],
-          })
-
-          return <SpotlightAnimation as={as}>{Children}</SpotlightAnimation>
-        },
-        TableWithDrawers: ({ node }) => {
-          return (
-            <TableWithDrawers
-              columns={node.fields.columns as unknown as any}
-              rows={node.fields.rows as unknown as any}
-            />
-          )
-        },
-        templateCards: ({ node }) => {
-          const { templates } = node.fields
-          if (!templates) {
-            return null
-          }
-          return <TemplateCards templates={templates} />
-        },
-        Upload: ({ node }) => {
-          return (
-            <UploadBlockImage
-              alt={node.fields.alt ?? undefined}
-              caption={node.fields.caption ?? undefined}
-              src={node.fields.src}
-            />
-          )
-        },
-        video: ({ node }) => {
-          const { url } = node.fields
-          return url ? <Video {...getVideo(url)} /> : null
-        },
-        VideoDrawer: ({ node }) => {
-          return (
-            <VideoDrawer
-              drawerTitle={node.fields.drawerTitle}
-              id={node.fields.id}
-              label={node.fields.label}
-            />
-          )
-        },
-        YouTube: ({ node }) => {
-          return <YouTube id={node.fields.id} title={node.fields.title ?? ''} />
-        },
+export const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => {
+  const converters: JSXConverters<NodeTypes> = {
+    ...defaultConverters,
+    ...CustomTableJSXConverters,
+    blocks: {
+      br: () => <br />,
+      commandLine: ({ node }) => {
+        const { command } = node.fields
+        if (command) {
+          return <CommandLine command={command} lexical />
+        }
+        return null
       },
-      label: ({ node, nodesToJSX }) => {
-        return <Label>{nodesToJSX({ nodes: node.children })}</Label>
+      downloadBlock: ({ node }) => {
+        return <Download {...node.fields} />
       },
-      largeBody: ({ node, nodesToJSX }) => {
-        return <LargeBody>{nodesToJSX({ nodes: node.children })}</LargeBody>
+      spotlight: ({ node, nodesToJSX }) => {
+        const { element, richText } = node.fields
+
+        const as: AllowedElements = (element as AllowedElements) ?? 'h2'
+
+        const Children = nodesToJSX({
+          nodes: richText?.root?.children as SerializedLexicalNode[],
+        })
+
+        return <SpotlightAnimation as={as}>{Children}</SpotlightAnimation>
       },
-      link: ({ node, nodesToJSX }) => {
-        const fields = node.fields
-
-        return (
-          <CMSLink
-            newTab={Boolean(fields?.newTab)}
-            reference={fields.doc as Reference}
-            type={fields.linkType === 'internal' ? 'reference' : 'custom'}
-            url={fields.url}
-          >
-            {nodesToJSX({ nodes: node.children })}
-          </CMSLink>
-        )
+      video: ({ node }) => {
+        const { url } = node.fields
+        return url ? <Video {...getVideo(url)} /> : null
       },
-      upload: ({ node }) => {
-        return <RichTextUpload node={node} />
-      },
-    }
-
-    if (toc) {
-      converters.heading = HeadingComponent as any
-    }
-
-    return converters
-  }
-
-export const RichTextWithTOC: React.FC<Props> = ({ className, content: _content }) => {
-  const [toc, setTOC] = useState<Map<string, Heading>>(new Map())
-
-  const initialData = useMemo(() => ({ content: _content }) as Doc, [_content])
-
-  const { data } = useLivePreview<Doc>({
-    depth: 2,
-    initialData,
-    serverURL: process.env.NEXT_PUBLIC_CMS_URL as string,
-  })
-
-  // Fall back to the server-provided content so the doc body is present in the
-  // server-rendered HTML.
-  const content = data?.content ?? _content
-
-  const addHeading: AddHeading = useCallback(
-    (anchor, heading, type) => {
-      if (!toc.has(anchor)) {
-        const newTOC = new Map(toc)
-        newTOC.set(anchor, { type, anchor, heading })
-        setTOC(newTOC)
-      }
     },
-    [toc],
-  )
+    label: ({ node, nodesToJSX }) => {
+      return <Label>{nodesToJSX({ nodes: node.children })}</Label>
+    },
+    largeBody: ({ node, nodesToJSX }) => {
+      return <LargeBody>{nodesToJSX({ nodes: node.children })}</LargeBody>
+    },
+    link: ({ node, nodesToJSX }) => {
+      const fields = node.fields
 
-  if (!content) {
-    return null
+      return (
+        <CMSLink
+          newTab={Boolean(fields?.newTab)}
+          reference={fields.doc as Reference}
+          type={fields.linkType === 'internal' ? 'reference' : 'custom'}
+          url={fields.url}
+        >
+          {nodesToJSX({ nodes: node.children })}
+        </CMSLink>
+      )
+    },
+    upload: ({ node }) => {
+      return <RichTextUpload node={node} />
+    },
   }
 
-  const context: IContext = {
-    addHeading,
-    toc: Array.from(toc).reverse(),
-  }
-
-  return (
-    <RichTextContext value={context}>
-      <SerializedRichText
-        className={['payload-richtext', 'docs-richtext', className].filter(Boolean).join(' ')}
-        converters={jsxConverters({ toc: true })}
-        data={content}
-      />
-    </RichTextContext>
-  )
+  return converters
 }
 
 export const RichText: React.FC<Props> = ({ className, content }) => {
@@ -322,10 +108,8 @@ export const RichText: React.FC<Props> = ({ className, content }) => {
   return (
     <SerializedRichText
       className={['payload-richtext', className].filter(Boolean).join(' ')}
-      converters={jsxConverters({ toc: false })}
+      converters={jsxConverters}
       data={content}
     />
   )
 }
-
-export { Arrow, BulletList, Pill }

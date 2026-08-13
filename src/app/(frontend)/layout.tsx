@@ -15,15 +15,13 @@ import '../../css/app.scss'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html data-theme="light" lang="en">
       <PrivacyProvider>
         <head>
           <link href="/images/favicon.svg" rel="icon" />
-          {featureFlags.cloud && <link href={process.env.NEXT_PUBLIC_CLOUD_CMS_URL} rel="dns-prefetch" />}
-          {(featureFlags.cloud || featureFlags.communityHelp || featureFlags.docs) && (
+          {featureFlags.communityHelp && (
             <link href="https://api.github.com/repos/payloadcms/payload" rel="dns-prefetch" />
           )}
-          {featureFlags.docs && <link href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" rel="stylesheet" />}
           <link href="https://www.googletagmanager.com" rel="preconnect" />
           <link href="https://www.google-analytics.com" rel="preconnect" />
           <GoogleAnalytics />

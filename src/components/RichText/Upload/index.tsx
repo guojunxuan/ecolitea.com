@@ -7,43 +7,19 @@ import { CMSLink } from '@components/CMSLink/index'
 import { Media } from '@components/Media/index'
 import React from 'react'
 
-export type RichTextUploadNodeType = {
-  fields: {
-    enableLink?: boolean
-    link?: CMSLinkType
-  }
-  relationTo: string
-  value?: MediaType
-}
-
 export type Props = {
   className?: string
   node: SerializedUploadNode
 }
 
-export const RichTextUpload: React.FC<Props> = (props) => {
-  const {
-    className,
-    node: { fields, value },
-  } = props
-
-  let Wrap: React.ComponentType<CMSLinkType> | string = 'div'
-
-  const styles: React.CSSProperties = {}
-
-  let wrapProps: CMSLinkType = {}
-
-  if (fields?.enableLink) {
-    Wrap = CMSLink
-    wrapProps = {
-      ...fields?.link,
-    }
-  }
+export const RichTextUpload: React.FC<Props> = ({ className, node: { fields, value } }) => {
+  const Wrap: React.ComponentType<CMSLinkType> | string = fields?.enableLink ? CMSLink : 'div'
+  const wrapProps: CMSLinkType = fields?.enableLink ? { ...fields.link } : {}
 
   return (
     typeof value !== 'string' &&
     typeof value !== 'number' && (
-      <div className={className} style={styles}>
+      <div className={className}>
         <Wrap {...wrapProps}>
           <Media resource={value as TypedUploadCollection[UploadCollectionSlug]} />
         </Wrap>

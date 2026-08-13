@@ -10,6 +10,17 @@ Ecolitea is a CMS-driven website built on a tailored Payload implementation. Its
 - **Growth operations** — Receive form submissions and email notifications; configure SEO, redirects, analytics, and operational counters.
 - **Administration** — Maintain administrator users and access to the content-management workspace.
 
+## Current Branch: Site Navigation Redesign
+
+The `chore/site-navigation-redesign` branch streamlines the original Payload website into the Ecolitea site and delivers the following system changes:
+
+- **Focused application scope** — Removes the inherited Payload Cloud account, billing, deployment, and documentation experiences so the repository serves the Ecolitea website and CMS.
+- **CMS-driven navigation** — Provides a responsive desktop navigation system and a mobile menu with three-level drill-down navigation, parent links, back navigation, and accessible controls.
+- **CMS-driven footer** — Lets editors manage the brand description, navigation columns, contact details, social links, newsletter content, legal links, and copyright text.
+- **Unified Ecolitea identity** — Uses the Ecolitea vector lockup consistently in desktop navigation, mobile navigation, and the footer with accessible homepage links.
+- **Responsive presentation** — Defines desktop and mobile typography, spacing, wrapping, touch targets, and navigation/footer layout behavior.
+- **Schema rollout and regression coverage** — Includes the footer brand-description migration, generated Payload types, and automated tests for navigation, footer content, layout, icons, links, schema, and branding.
+
 ## Production Architecture
 
 ```mermaid
@@ -65,19 +76,30 @@ corepack pnpm@9.15.4 build:skipDocs
 
 Local development uses the generic `DATABASE_URI` in `.env`. Use `payload migrate` only when a release intentionally introduces a database schema change. `build:skipDocs` is the production build used by this streamlined Ecolitea installation.
 
+### Validate a development branch in GitHub Actions
+
+Development branches do not need a Git tag. Push the branch to GitHub, then open **Actions → CI Ecolitea → Run workflow**:
+
+1. Select the development branch in the **Use workflow from** menu.
+2. Select **Run workflow**.
+
+The CI workflow checks out the selected branch, installs the locked dependencies, runs the complete automated test suite, type-checks the project, and runs the production build against a disposable CI MongoDB service. It has read-only repository permissions and cannot create a Git tag, container image, package, GitHub Release, or production database change. Keep the workflow on the development branch until these checks pass, then open the pull request to `main`.
+
+While this `ci.yml` is not yet available from the default branch, run **Actions → Release Ecolitea → Run workflow** on the development branch and leave the optional `version` field empty. The same validation runs, and the publishing job is marked as skipped.
+
 ## Environment Configuration
 
 Keep environment values in `.env` locally and on the server. Use placeholders rather than live credentials in documentation or deployment manifests; do not commit `.env`.
 
-| Group | Variables | Purpose |
-| --- | --- | --- |
-| Core application | `PAYLOAD_SECRET`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CMS_URL`, `PAYLOAD_PUBLIC_APP_URL`, `SITEMAP_URL`, `NEXT_PUBLIC_IS_LIVE` | Session security, canonical application URLs, sitemap host, and production indexing. Set `NEXT_PUBLIC_IS_LIVE=true` in production. |
-| Local database | `DATABASE_URI` | Generic MongoDB connection string for local development. |
-| Docker database | `MONGODB_URI`, `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` | The production application connection string and MongoDB's first-run root-user initialization values. |
-| Docker deployment | `DOMAIN`, `ECOLITEA_IMAGE`, `IMAGE_TAG` | The public host name, GHCR image reference, and selected immutable release image tag. |
-| Media storage | `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_PUBLIC_URL` | Cloudflare R2 bucket access and the public media origin. |
-| Optional email and analytics | `SENDGRID_API_KEY`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_MEASUREMENT_ID`, `NEXT_PUBLIC_FACEBOOK_PIXEL_ID`, `GA_USE_DEMO_DATA` | Optional email notifications and analytics integrations. Set `GA_USE_DEMO_DATA=false` in production. |
-| Optional forms and publishing | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `NEXT_PRIVATE_RECAPTCHA_SECRET_KEY`, `NEXT_PRIVATE_HUBSPOT_PORTAL_KEY`, `NEXT_PRIVATE_DRAFT_SECRET`, `REVALIDATION_KEY`, `NEXT_PRIVATE_REVALIDATION_KEY` | Optional reCAPTCHA and form integrations, draft access, and controlled content revalidation. |
+| Group                         | Variables                                                                                                                                                                                  | Purpose                                                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Core application              | `PAYLOAD_SECRET`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CMS_URL`, `PAYLOAD_PUBLIC_APP_URL`, `SITEMAP_URL`, `NEXT_PUBLIC_IS_LIVE`                                                            | Session security, canonical application URLs, sitemap host, and production indexing. Set `NEXT_PUBLIC_IS_LIVE=true` in production. |
+| Local database                | `DATABASE_URI`                                                                                                                                                                             | Generic MongoDB connection string for local development.                                                                           |
+| Docker database               | `MONGODB_URI`, `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD`                                                                                                                  | The production application connection string and MongoDB's first-run root-user initialization values.                              |
+| Docker deployment             | `DOMAIN`, `ECOLITEA_IMAGE`, `IMAGE_TAG`                                                                                                                                                    | The public host name, GHCR image reference, and selected immutable release image tag.                                              |
+| Media storage                 | `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_PUBLIC_URL`                                                                                                    | Cloudflare R2 bucket access and the public media origin.                                                                           |
+| Optional email and analytics  | `SENDGRID_API_KEY`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_MEASUREMENT_ID`, `NEXT_PUBLIC_FACEBOOK_PIXEL_ID`, `GA_USE_DEMO_DATA`                                                 | Optional email notifications and analytics integrations. Set `GA_USE_DEMO_DATA=false` in production.                               |
+| Optional forms and publishing | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `NEXT_PRIVATE_RECAPTCHA_SECRET_KEY`, `NEXT_PRIVATE_HUBSPOT_PORTAL_KEY`, `NEXT_PRIVATE_DRAFT_SECRET`, `REVALIDATION_KEY`, `NEXT_PRIVATE_REVALIDATION_KEY` | Optional reCAPTCHA and form integrations, draft access, and controlled content revalidation.                                       |
 
 For a Docker deployment, set `MONGODB_URI` to an authenticated internal connection string. It is passed to the application as `DATABASE_URI`:
 
@@ -145,14 +167,14 @@ Cloudflare R2 -> public media storage
 
 ### Infrastructure contract
 
-| Component | Responsibility |
-| --- | --- |
-| Cloudflare | DNS, CDN caching, and edge TLS. Enable the proxy for `YOUR_DOMAIN` and use **Full (strict)** SSL/TLS mode so Cloudflare validates the origin certificate. |
-| Caddy | Runs in Docker Compose, uses `DOMAIN` as the origin host, terminates origin TLS, and forwards traffic to the Ecolitea container. |
-| Docker Compose | Runs the Ecolitea application image, MongoDB, and Caddy as coordinated services. |
-| MongoDB volume | The named `mongodb_data` volume persists application data independently of container replacement. MongoDB initializes its root user only on first use. |
-| Cloudflare R2 | Stores public uploads independently of the server filesystem and container lifecycle. |
-| GHCR | Publishes public images such as `ghcr.io/GHCR_OWNER/ecolitea:YOUR_IMAGE_TAG`. |
+| Component      | Responsibility                                                                                                                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cloudflare     | DNS, CDN caching, and edge TLS. Enable the proxy for `YOUR_DOMAIN` and use **Full (strict)** SSL/TLS mode so Cloudflare validates the origin certificate. |
+| Caddy          | Runs in Docker Compose, uses `DOMAIN` as the origin host, terminates origin TLS, and forwards traffic to the Ecolitea container.                          |
+| Docker Compose | Runs the Ecolitea application image, MongoDB, and Caddy as coordinated services.                                                                          |
+| MongoDB volume | The named `mongodb_data` volume persists application data independently of container replacement. MongoDB initializes its root user only on first use.    |
+| Cloudflare R2  | Stores public uploads independently of the server filesystem and container lifecycle.                                                                     |
+| GHCR           | Publishes public images such as `ghcr.io/GHCR_OWNER/ecolitea:YOUR_IMAGE_TAG`.                                                                             |
 
 MongoDB data is separate from the application image. It is not automatically migrated by Docker Compose or the release workflow. Preserve the `mongodb_data` volume during maintenance; do not remove it when stopping or replacing application containers.
 
@@ -194,14 +216,13 @@ Keep the previously deployed immutable `IMAGE_TAG`. To roll back, set it again i
 
 ## Release Images
 
-The release workflow is started manually from **Actions → Release Ecolitea → Run workflow**. Before running it, create and push a Docker-compatible Git tag that identifies the release:
+The **Release Ecolitea** workflow has an optional `version` field. Leave it empty to run tests, type-checking, and the production build on the selected branch; the Tag, GHCR, and GitHub Release job is skipped. This validation-only mode is safe for development branches and `main`.
 
-```bash
-git tag YOUR_IMAGE_TAG
-git push origin YOUR_IMAGE_TAG
-```
+After the feature pull request is merged, run the workflow on `main` with the version empty. Only after that validation succeeds, run it again from `main` and enter a new semantic version such as `v1.1.0`.
 
-Enter that existing tag in the required `tag` field. The workflow validates and checks out the tag, typechecks the project, builds against a disposable CI MongoDB instance, builds the container image, and pushes both the selected-tag and commit-SHA image tags to GHCR. It then creates a GitHub Release with `--generate-notes`. It never connects to, migrates, or otherwise changes production MongoDB data. The workflow sends no external notification.
+When a version is supplied, the workflow rejects non-`main` runs, malformed versions, and versions whose Git tags already exist. It then runs the complete tests, type-check, production build, and a non-publishing container build against a disposable CI MongoDB service. Only after every check succeeds does it create and push the annotated Git tag, rebuild and push the version, commit-SHA, and `latest` image tags to GHCR, and create a GitHub Release with generated notes.
+
+The release workflow never connects to, migrates, or otherwise changes production MongoDB data. If validation fails, it creates no Git tag, container package, or GitHub Release. The workflow sends no external notification.
 
 Before the first release is deployed, open the new GHCR package's GitHub package settings and set its visibility to **Public**.
 
@@ -209,11 +230,11 @@ Before the first release is deployed, open the new GHCR package's GitHub package
 
 Configure these repository-level GitHub Actions Variables before running the release workflow:
 
-| Variable | Required value |
-| --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://YOUR_DOMAIN` |
-| `NEXT_PUBLIC_CMS_URL` | `https://YOUR_DOMAIN` |
-| `R2_PUBLIC_URL` | `https://media.YOUR_DOMAIN` |
+| Variable               | Required value              |
+| ---------------------- | --------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | `https://YOUR_DOMAIN`       |
+| `NEXT_PUBLIC_CMS_URL`  | `https://YOUR_DOMAIN`       |
+| `R2_PUBLIC_URL`        | `https://media.YOUR_DOMAIN` |
 
 These are build-time values and must match production because Next.js public values are baked into the image. No custom Secret is required for a release.
 
@@ -225,23 +246,24 @@ R2_PUBLIC_URL=https://media.YOUR_DOMAIN
 
 ## Operations
 
-| Routine | What to do |
-| --- | --- |
-| Database migrations | No migration runs during image build, first deployment, or routine application-only update. Plan and run an intentional schema migration separately, with a verified MongoDB backup. |
-| Type safety | The release workflow runs `corepack pnpm@9.15.4 exec tsc --noEmit --incremental false` before publishing an image. |
-| Production build | The release workflow builds the production image before it is pushed to GHCR. |
-| Service health | Review `docker compose ps` and `docker compose logs` after deployment. |
-| MongoDB backup | Back up `mongodb_data` before an intentionally run schema migration and retain a restore-tested copy. |
-| R2 verification | Confirm the bucket credentials allow the required upload, read, and delete operations and that `R2_PUBLIC_URL` serves media publicly. |
-| Image rollback | Keep the previous GHCR image tag available until the new release is verified. |
+| Routine                | What to do                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Database migrations    | No migration runs during image build, first deployment, or routine application-only update. Plan and run an intentional schema migration separately, with a verified MongoDB backup. |
+| Development validation | Run **CI Ecolitea** manually on the selected branch to test, type-check, and build without publishing anything.                                                                      |
+| Type safety            | Both CI and release workflows run `corepack pnpm@9.15.4 exec tsc --noEmit --incremental false`; release publishing waits for it to pass.                                             |
+| Production build       | Both workflows run `build:skipDocs`; the release workflow creates the Git tag and pushes the container image only after every validation step succeeds.                              |
+| Service health         | Review `docker compose ps` and `docker compose logs` after deployment.                                                                                                               |
+| MongoDB backup         | Back up `mongodb_data` before an intentionally run schema migration and retain a restore-tested copy.                                                                                |
+| R2 verification        | Confirm the bucket credentials allow the required upload, read, and delete operations and that `R2_PUBLIC_URL` serves media publicly.                                                |
+| Image rollback         | Keep the previous GHCR image tag available until the new release is verified.                                                                                                        |
 
 ## Troubleshooting
 
-| Symptom | Check | Corrective action |
-| --- | --- | --- |
-| The application cannot connect to MongoDB | `MONGODB_URI`, service name, network, and MongoDB logs | Confirm the authenticated URI, including `authSource=admin`, and ensure MongoDB is healthy before starting the application. |
-| Media uploads fail or images do not load | R2 credentials, bucket name, endpoint, and public URL | Verify the R2 credentials and S3-compatible endpoint; ensure `R2_PUBLIC_URL` resolves to the public media domain. |
-| Admin sign-in or preview URLs use the wrong host | `NEXT_PUBLIC_SITE_URL` and `PAYLOAD_PUBLIC_APP_URL` | Set both URLs to `https://YOUR_DOMAIN`, then rebuild and redeploy the application. |
-| Forms do not send notifications | `SENDGRID_API_KEY` and the sending configuration | Supply a valid email service key and verify the provider configuration. |
-| Cloudflare returns a 502 or origin error | Caddy logs, container status, and application logs | Confirm Caddy can reach the application service and that Docker Compose reports Ecolitea, MongoDB, and Caddy as running. |
-| A release needs to be reverted | Current and previous image tags, database migration state | Re-deploy the previous immutable GHCR image tag; restore the matching MongoDB backup only after an intentional incompatible schema change. |
+| Symptom                                          | Check                                                     | Corrective action                                                                                                                          |
+| ------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| The application cannot connect to MongoDB        | `MONGODB_URI`, service name, network, and MongoDB logs    | Confirm the authenticated URI, including `authSource=admin`, and ensure MongoDB is healthy before starting the application.                |
+| Media uploads fail or images do not load         | R2 credentials, bucket name, endpoint, and public URL     | Verify the R2 credentials and S3-compatible endpoint; ensure `R2_PUBLIC_URL` resolves to the public media domain.                          |
+| Admin sign-in or preview URLs use the wrong host | `NEXT_PUBLIC_SITE_URL` and `PAYLOAD_PUBLIC_APP_URL`       | Set both URLs to `https://YOUR_DOMAIN`, then rebuild and redeploy the application.                                                         |
+| Forms do not send notifications                  | `SENDGRID_API_KEY` and the sending configuration          | Supply a valid email service key and verify the provider configuration.                                                                    |
+| Cloudflare returns a 502 or origin error         | Caddy logs, container status, and application logs        | Confirm Caddy can reach the application service and that Docker Compose reports Ecolitea, MongoDB, and Caddy as running.                   |
+| A release needs to be reverted                   | Current and previous image tags, database migration state | Re-deploy the previous immutable GHCR image tag; restore the matching MongoDB backup only after an intentional incompatible schema change. |

@@ -1,207 +1,296 @@
-'use client'
+"use client";
 
-import type { Theme } from '@root/providers/Theme/types'
-import type { Footer as FooterType } from '@types'
+import type { Footer as FooterType } from "@types";
 
-import { BackgroundGrid } from '@components/BackgroundGrid/index'
-import { CMSLink } from '@components/CMSLink/index'
-import { Gutter } from '@components/Gutter/index'
-import { NewsletterSignUp } from '@components/NewsletterSignUp'
-import Payload3D from '@components/Payload3D/index'
-import { Text } from '@forms/fields/Text/index'
-import FormComponent from '@forms/Form/index'
-import { validateEmail } from '@forms/validations'
-import { ArrowIcon } from '@icons/ArrowIcon/index'
-import { DiscordIcon } from '@root/graphics/DiscordIcon/index'
-import { FacebookIcon } from '@root/graphics/FacebookIcon/index'
-import { InstagramIcon } from '@root/graphics/InstagramIcon/index'
-import { ThemeAutoIcon } from '@root/graphics/ThemeAutoIcon/index'
-import { ThemeDarkIcon } from '@root/graphics/ThemeDarkIcon/index'
-import { ThemeLightIcon } from '@root/graphics/ThemeLightIcon/index'
-import { TwitterIconAlt } from '@root/graphics/TwitterIconAlt/index'
-import { YoutubeIcon } from '@root/graphics/YoutubeIcon/index'
-import { ChevronUpDownIcon } from '@root/icons/ChevronUpDownIcon/index'
-import { useHeaderObserver } from '@root/providers/HeaderIntersectionObserver/index'
-import { useThemePreference } from '@root/providers/Theme/index'
-import { getImplicitPreference, themeLocalStorageKey } from '@root/providers/Theme/shared'
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useId } from 'react'
+import { CMSLink } from "@components/CMSLink/index";
+import { Gutter } from "@components/Gutter/index";
+import { FullLogo } from "@root/graphics/FullLogo/index";
+import { getFooterSocialPlatformLabel } from "@root/globals/footerSocials.js";
+import Link from "next/link";
+import React, { useId, useState } from "react";
 
-import classes from './index.module.scss'
+import { getFooterContactItems } from "./contact.js";
+import { FooterContactList } from "./ContactList";
+import {
+  getFooterCopyright,
+  getSafeFooterLink,
+  isSafeFooterSocialURL,
+  normalizeFooterRows,
+} from "./content.js";
+import classes from "./index.module.scss";
+import { getNextFooterAccordionItem } from "./navigation.js";
+import { footerSocialIcons } from "./socialIcons";
+
+const hasFooterSocialIcon = (
+  platform: unknown,
+): platform is keyof typeof footerSocialIcons =>
+  typeof platform === "string" &&
+  Object.prototype.hasOwnProperty.call(footerSocialIcons, platform);
+
+const isFooterRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
 
 export const Footer: React.FC<FooterType> = (props) => {
-  const { columns } = props
-  const [products, developers, company] = columns ?? []
-  const { setTheme } = useThemePreference()
-  const { setHeaderTheme } = useHeaderObserver()
-  const wrapperRef = React.useRef<HTMLElement>(null)
-  const selectRef = React.useRef<HTMLSelectElement>(null)
-
-  const onThemeChange = (themeToSet: 'auto' & Theme) => {
-    if (themeToSet === 'auto') {
-      const implicitPreference = getImplicitPreference() ?? 'light'
-      setHeaderTheme(implicitPreference)
-      setTheme(implicitPreference)
-      if (selectRef.current) {
-        selectRef.current.value = 'auto'
-      }
-    } else {
-      setTheme(themeToSet)
-      setHeaderTheme(themeToSet)
-    }
-  }
-
-  React.useEffect(() => {
-    const preference = window.localStorage.getItem(themeLocalStorageKey)
-    if (selectRef.current) {
-      selectRef.current.value = preference ?? 'auto'
-    }
-  }, [])
-
-  const pathname = usePathname()
-
-  const allowedSegments = [
-    'cloud',
-    'cloud-terms',
-    'forgot-password',
-    'join-team',
-    'login',
-    'logout',
-    'new',
-    'reset-password',
-    'verify',
-    'signup',
-  ]
-
-  const pathnameSegments = pathname.split('/').filter(Boolean)
-  const isCloudPage = pathnameSegments.some((segment) => allowedSegments.includes(segment))
-
-  const themeId = useId()
+  const {
+    brand,
+    columns: columnsFromProps,
+    companyName,
+    contact,
+    copyrightText,
+    newsletter,
+    socialLinks: socialLinksFromProps,
+  } = props;
+  const columns = normalizeFooterRows(columnsFromProps);
+  const socialLinks = normalizeFooterRows(socialLinksFromProps);
+  const contactItems = getFooterContactItems(contact);
+  const [openColumnID, setOpenColumnID] = useState<null | string>(null);
+  const accordionID = useId();
+  const currentYear = new Date().getUTCFullYear();
 
   return (
-    <footer className={classes.footer} data-theme="dark" ref={wrapperRef}>
-      <BackgroundGrid
-        className={[classes.background, isCloudPage ? classes.topBorder : '']
-          .filter(Boolean)
-          .join(' ')}
-        zIndex={2}
-      />
-      <Gutter className={classes.container}>
-        <div className={[classes.grid, 'grid'].filter(Boolean).join(' ')}>
-          <div className={['cols-4 cols-m-8 cols-s-8'].filter(Boolean).join(' ')}>
-            <p className={classes.colHeader}>{products?.label}</p>
-            <div className={classes.colItems}>
-              {products?.navItems?.map(({ link }, index) => {
-                return (
-                  <React.Fragment key={index}>
-                    <CMSLink className={classes.link} {...link} />
-                  </React.Fragment>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className={['cols-4 cols-m-8 cols-s-8'].filter(Boolean).join(' ')}>
-            <p className={classes.colHeader}>{developers?.label}</p>
-            <div className={classes.colItems}>
-              {developers?.navItems?.map(({ link }, index) => {
-                return (
-                  <React.Fragment key={index}>
-                    <CMSLink className={classes.link} {...link} />
-                  </React.Fragment>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className={['cols-4 cols-m-8 cols-s-8'].filter(Boolean).join(' ')}>
-            <p className={classes.colHeader}>{company?.label}</p>
-            <div className={classes.colItems}>
-              {company?.navItems?.map(({ link }, index) => {
-                return (
-                  <React.Fragment key={index}>
-                    <CMSLink className={classes.link} {...link} />
-                  </React.Fragment>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className={['cols-4 cols-m-4 cols-s-8'].filter(Boolean).join(' ')}>
-            <p className={`${classes.colHeader} ${classes.thirdColumn}`}>Stay connected</p>
-            <NewsletterSignUp />
-
-            <div className={classes.socialLinks}>
-              <a
-                aria-label="Payload's Twitter page"
-                className={`${classes.socialIconLink} ${classes.twitterIcon}`}
-                href="https://twitter.com/payloadcms"
-                rel="noopener noreferrer"
-                target="_blank"
+    <footer className={classes.footer} data-theme="dark">
+      <Gutter className={classes.gutter}>
+        <div className={classes.container}>
+          <div className={classes.content}>
+            <section className={classes.brand}>
+              <Link
+                aria-label="Go to Ecolitea homepage"
+                className={classes.logo}
+                href="/"
+                prefetch={false}
               >
-                <TwitterIconAlt />
-              </a>
-              <a
-                aria-label="Payload's Discord"
-                className={classes.socialIconLink}
-                href="https://discord.com/invite/r6sCXqVk3v"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <DiscordIcon />
-              </a>
-              <a
-                aria-label="Payload's YouTube channel"
-                className={classes.socialIconLink}
-                href="https://www.youtube.com/channel/UCyrx4Wpd4SBIpqUKlkb6N1Q"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <YoutubeIcon />
-              </a>
-              <a
-                aria-label="Payload's Instagram page"
-                className={classes.socialIconLink}
-                href="https://www.instagram.com/payloadcms/"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <InstagramIcon />
-              </a>
-            </div>
+                <FullLogo />
+              </Link>
 
-            <div className={classes.selectContainer}>
-              <label className="visually-hidden" htmlFor={themeId}>
-                Switch themes
-              </label>
-              {selectRef?.current && (
-                <div className={`${classes.switcherIcon} ${classes.themeIcon}`}>
-                  {selectRef.current.value === 'auto' && <ThemeAutoIcon />}
-                  {selectRef.current.value === 'light' && <ThemeLightIcon />}
-                  {selectRef.current.value === 'dark' && <ThemeDarkIcon />}
+              {typeof brand?.description === "string" && brand.description.trim() ? (
+                <p className={classes.description}>{brand.description}</p>
+              ) : null}
+
+              <ul aria-label="Social media" className={classes.socialLinks}>
+                {socialLinks.map((socialLink, index) => {
+                  if (!isFooterRecord(socialLink)) {
+                    return null;
+                  }
+
+                  const { id, platform, url } = socialLink;
+                  if (
+                    !hasFooterSocialIcon(platform) ||
+                    typeof url !== "string" ||
+                    !isSafeFooterSocialURL(url)
+                  ) {
+                    return null;
+                  }
+
+                  const Icon = footerSocialIcons[platform];
+
+                  return (
+                    <li
+                      key={
+                        (typeof id === "string" && id) || `${platform}-${index}`
+                      }
+                    >
+                      <a
+                        aria-label={getFooterSocialPlatformLabel(platform)}
+                        className={classes.socialLink}
+                        href={url.trim()}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        <span aria-hidden="true">
+                          <Icon />
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            <nav aria-label="Footer" className={classes.navigation}>
+              <div
+                className={classes.desktopNavigation}
+                style={
+                  {
+                    "--footer-column-count": Math.max(columns.length, 1),
+                  } as React.CSSProperties
+                }
+              >
+                {columns.map((column, columnIndex) => {
+                  if (!isFooterRecord(column)) {
+                    return null;
+                  }
+
+                  const { id, label, navItems: navItemsFromColumn } = column;
+                  if (typeof label !== "string" || !label.trim()) {
+                    return null;
+                  }
+
+                  const navItems = normalizeFooterRows(navItemsFromColumn);
+                  const columnKey =
+                    (typeof id === "string" && id) ||
+                    `desktop-column-${columnIndex}`;
+
+                  return (
+                    <section
+                      className={classes.navigationGroup}
+                      key={columnKey}
+                    >
+                      <h2 className={classes.navigationHeading}>{label}</h2>
+                      <div className={classes.navigationLinks}>
+                        {navItems.map((navItem, linkIndex) => {
+                          if (!isFooterRecord(navItem)) {
+                            return null;
+                          }
+
+                          const safeLink = getSafeFooterLink(
+                            navItem.link,
+                            "desktop",
+                          );
+                          if (!safeLink) {
+                            return null;
+                          }
+
+                          const navItemID = navItem.id;
+                          const linkLabel = safeLink.label;
+
+                          return (
+                            <CMSLink
+                              {...safeLink}
+                              className={classes.navigationLink}
+                              key={
+                                (typeof navItemID === "string" && navItemID) ||
+                                `${typeof linkLabel === "string" ? linkLabel : "link"}-${linkIndex}`
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+
+              <div className={classes.mobileNavigation}>
+                {columns.map((column, columnIndex) => {
+                  if (!isFooterRecord(column)) {
+                    return null;
+                  }
+
+                  const { id, label, navItems: navItemsFromColumn } = column;
+                  if (typeof label !== "string" || !label.trim()) {
+                    return null;
+                  }
+
+                  const navItems = normalizeFooterRows(navItemsFromColumn);
+                  const columnID =
+                    (typeof id === "string" && id) ||
+                    `${accordionID}-column-${columnIndex}`;
+                  const panelID = `${accordionID}-panel-${columnIndex}`;
+                  const isOpen = openColumnID === columnID;
+
+                  return (
+                    <div className={classes.navigationGroup} key={columnID}>
+                      <h2 className={classes.mobileNavigationHeading}>
+                        <button
+                          aria-controls={panelID}
+                          aria-expanded={isOpen}
+                          className={classes.navigationTrigger}
+                          onClick={() =>
+                            setOpenColumnID((current) =>
+                              getNextFooterAccordionItem(current, columnID),
+                            )
+                          }
+                          type="button"
+                        >
+                          <span>{label}</span>
+                          <span
+                            aria-hidden="true"
+                            className={classes.navigationArrow}
+                          />
+                        </button>
+                      </h2>
+                      <div
+                        className={classes.navigationPanel}
+                        hidden={!isOpen}
+                        id={panelID}
+                      >
+                        {navItems.map((navItem, linkIndex) => {
+                          if (!isFooterRecord(navItem)) {
+                            return null;
+                          }
+
+                          const safeLink = getSafeFooterLink(
+                            navItem.link,
+                            "mobile",
+                          );
+                          if (!safeLink) {
+                            return null;
+                          }
+
+                          const navItemID = navItem.id;
+                          const linkLabel = safeLink.label;
+
+                          return (
+                            <CMSLink
+                              {...safeLink}
+                              className={classes.navigationLink}
+                              key={
+                                (typeof navItemID === "string" && navItemID) ||
+                                `${typeof linkLabel === "string" ? linkLabel : "link"}-${linkIndex}`
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </nav>
+
+            <section className={classes.details}>
+              <div className={classes.newsletter}>
+                {typeof newsletter?.heading === "string" &&
+                newsletter.heading.trim() ? (
+                  <h2>{newsletter.heading}</h2>
+                ) : null}
+                {typeof newsletter?.description === "string" &&
+                newsletter.description.trim() ? (
+                  <p>{newsletter.description}</p>
+                ) : null}
+                <div className={classes.subscribePlaceholder}>
+                  <input
+                    aria-label="Email address"
+                    disabled
+                    placeholder={newsletter?.emailPlaceholder || ""}
+                    type="email"
+                  />
+                  <button disabled type="button">
+                    Subscribe
+                  </button>
                 </div>
-              )}
+              </div>
 
-              <select
-                id={themeId}
-                onChange={(e) => onThemeChange(e.target.value as 'auto' & Theme)}
-                ref={selectRef}
-              >
-                <option value="auto">Auto</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-
-              <ChevronUpDownIcon
-                className={`${classes.switcherIcon} ${classes.upDownChevronIcon}`}
+              <FooterContactList
+                classNames={{
+                  contact: classes.contact,
+                  contactIcon: classes.contactIcon,
+                  contactItem: classes.contactItem,
+                  contactList: classes.contactList,
+                  contactText: classes.contactText,
+                }}
+                items={contactItems}
               />
-            </div>
+            </section>
+          </div>
+
+          <div className={classes.copyright}>
+            <p suppressHydrationWarning>
+              {getFooterCopyright(currentYear, companyName, copyrightText)}
+            </p>
           </div>
         </div>
       </Gutter>
-      <Gutter className={classes.payload3dContainer}>
-        <Payload3D />
-      </Gutter>
     </footer>
-  )
-}
+  );
+};
