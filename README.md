@@ -78,13 +78,12 @@ Local development uses the generic `DATABASE_URI` in `.env`. Use `payload migrat
 
 ### Validate a development branch in GitHub Actions
 
-Development branches do not need a Git tag. Push the branch to GitHub, then open **Actions → Validate or Release Ecolitea → Run workflow**:
+Development branches do not need a Git tag. Push the branch to GitHub, then open **Actions → CI Ecolitea → Run workflow**:
 
 1. Select the development branch in the **Use workflow from** menu.
-2. Leave the optional `tag` field empty.
-3. Select **Run workflow**.
+2. Select **Run workflow**.
 
-This mode checks out the selected branch, installs the locked dependencies, type-checks the project, and runs the production build against a disposable CI MongoDB service. It does not create a Git tag, container image, package, GitHub Release, or production database change. Keep the workflow on the development branch until these checks pass, then open the pull request to `main`.
+The CI workflow checks out the selected branch, installs the locked dependencies, runs the complete automated test suite, type-checks the project, and runs the production build against a disposable CI MongoDB service. It has read-only repository permissions and cannot create a Git tag, container image, package, GitHub Release, or production database change. Keep the workflow on the development branch until these checks pass, then open the pull request to `main`.
 
 ## Environment Configuration
 
@@ -215,14 +214,11 @@ Keep the previously deployed immutable `IMAGE_TAG`. To roll back, set it again i
 
 ## Release Images
 
-The release mode is started manually from **Actions → Validate or Release Ecolitea → Run workflow**. Before running it, create and push a Docker-compatible Git tag that identifies the release:
+After the feature pull request is merged, run **Actions → CI Ecolitea → Run workflow** on `main`. Only after that run succeeds, start **Actions → Release Ecolitea → Run workflow** from `main` and enter a new semantic version such as `v1.1.0`.
 
-```bash
-git tag YOUR_IMAGE_TAG
-git push origin YOUR_IMAGE_TAG
-```
+The release workflow rejects non-`main` runs, malformed versions, and versions whose Git tags already exist. It then runs the complete tests, type-check, production build, and a non-publishing container build against a disposable CI MongoDB service. Only after every check succeeds does it create and push the annotated Git tag, rebuild and push the version, commit-SHA, and `latest` image tags to GHCR, and create a GitHub Release with generated notes.
 
-Enter that existing tag in the optional `tag` field to select release mode. The workflow validates and checks out the tag, runs the same type-check and production build used for branch validation against a disposable CI MongoDB instance, builds the container image, and pushes the selected-tag, commit-SHA, and `latest` image tags to GHCR. It then creates a GitHub Release with `--generate-notes`. It never connects to, migrates, or otherwise changes production MongoDB data. The workflow sends no external notification.
+The release workflow never connects to, migrates, or otherwise changes production MongoDB data. If validation fails, it creates no Git tag, container package, or GitHub Release. The workflow sends no external notification.
 
 Before the first release is deployed, open the new GHCR package's GitHub package settings and set its visibility to **Public**.
 
@@ -249,9 +245,9 @@ R2_PUBLIC_URL=https://media.YOUR_DOMAIN
 | Routine                | What to do                                                                                                                                                                           |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Database migrations    | No migration runs during image build, first deployment, or routine application-only update. Plan and run an intentional schema migration separately, with a verified MongoDB backup. |
-| Development validation | Run **Validate or Release Ecolitea** manually with an empty `tag` field to type-check and build the selected branch without publishing anything.                                     |
-| Type safety            | Both workflow modes run `corepack pnpm@9.15.4 exec tsc --noEmit --incremental false`; release publishing waits for it to pass.                                                       |
-| Production build       | Both workflow modes run `build:skipDocs`; release mode additionally builds and pushes the container image only after validation succeeds.                                            |
+| Development validation | Run **CI Ecolitea** manually on the selected branch to test, type-check, and build without publishing anything.                                                                      |
+| Type safety            | Both CI and release workflows run `corepack pnpm@9.15.4 exec tsc --noEmit --incremental false`; release publishing waits for it to pass.                                             |
+| Production build       | Both workflows run `build:skipDocs`; the release workflow creates the Git tag and pushes the container image only after every validation step succeeds.                              |
 | Service health         | Review `docker compose ps` and `docker compose logs` after deployment.                                                                                                               |
 | MongoDB backup         | Back up `mongodb_data` before an intentionally run schema migration and retain a restore-tested copy.                                                                                |
 | R2 verification        | Confirm the bucket credentials allow the required upload, read, and delete operations and that `R2_PUBLIC_URL` serves media publicly.                                                |
