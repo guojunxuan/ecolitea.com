@@ -95,6 +95,7 @@ RUN groupadd --gid 1001 ecolitea \
 COPY --from=builder --chown=ecolitea:ecolitea /app/package.json ./
 COPY --from=builder --chown=ecolitea:ecolitea /app/next.config.js ./
 COPY --from=builder --chown=ecolitea:ecolitea /app/redirects.js ./
+COPY --from=builder --chown=ecolitea:ecolitea /app/tsconfig.json ./
 
 COPY --from=builder --chown=ecolitea:ecolitea /app/src ./src
 COPY --from=builder --chown=ecolitea:ecolitea /app/public ./public
