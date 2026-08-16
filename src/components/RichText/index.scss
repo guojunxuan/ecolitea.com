@@ -1,6 +1,6 @@
 @use '@scss/common' as *;
 
-.payload-richtext {
+.ecolitea-richtext {
   @include color-links;
 
   &:not(.docs-richtext) {

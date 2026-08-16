@@ -7,7 +7,6 @@ import BackgroundGradient from '@components/BackgroundGradient/index'
 import { BackgroundGrid } from '@components/BackgroundGrid/index'
 import { BlockWrapper } from '@components/BlockWrapper/index'
 import { CMSLink } from '@components/CMSLink/index'
-import CreatePayloadApp from '@components/CreatePayloadApp'
 import { Gutter } from '@components/Gutter/index'
 import { MediaStack } from '@components/MediaStack'
 import { NewsletterSignUp } from '@components/NewsletterSignUp'
@@ -68,16 +67,6 @@ export const ThreeHero: React.FC<
                   <div className={classes.linksWrapper}>
                     {Array.isArray(buttons) &&
                       buttons.map((button, i) => {
-                        if (button.blockType === 'command') {
-                          return (
-                            <CreatePayloadApp
-                              background={false}
-                              className={classes.createPayloadApp}
-                              key={i + button.command}
-                              label={button.command}
-                            />
-                          )
-                        }
                         if (button.blockType === 'link' && button.link) {
                           return (
                             <CMSLink

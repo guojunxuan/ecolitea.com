@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 
-import { PayloadRedirects } from '@components/PayloadRedirects/index'
+import { EcoliteaRedirects } from '@components/EcoliteaRedirects/index'
 import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave/index'
 import { fetchCaseStudies, fetchCaseStudy } from '@data'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { brandMetadata } from '@root/seo/brandMetadata'
+import { canonicalURL, indexFollowRobots, noIndexFollowRobots } from '@root/seo/metadata'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
@@ -23,12 +25,12 @@ const CaseStudyBySlug = async ({ params }) => {
   const caseStudy = await getCaseStudy(slug, draft)
 
   if (!caseStudy) {
-    return <PayloadRedirects url={url} />
+    return <EcoliteaRedirects url={url} />
   }
 
   return (
     <>
-      <PayloadRedirects disableNotFound url={url} />
+      <EcoliteaRedirects disableNotFound url={url} />
       <RefreshRouteOnSave />
       <CaseStudy {...caseStudy} />
     </>
@@ -62,11 +64,16 @@ export async function generateMetadata({
     page?.meta?.image !== null &&
     'url' in page?.meta?.image &&
     `${process.env.NEXT_PUBLIC_CMS_URL}${page.meta.image.url}`
+  const path = `/case-studies/${slug}`
+  const description = page?.meta?.description || brandMetadata.description
 
   return {
-    description: page?.meta?.description,
+    alternates: {
+      canonical: canonicalURL(path, page?.canonical),
+    },
+    description,
     openGraph: mergeOpenGraph({
-      description: page?.meta?.description ?? undefined,
+      description,
       images: ogImage
         ? [
             {
@@ -74,9 +81,10 @@ export async function generateMetadata({
             },
           ]
         : undefined,
-      title: page?.meta?.title ?? undefined,
-      url: `/case-studies/${slug}`,
+      title: page?.meta?.title ?? page?.title ?? undefined,
+      url: canonicalURL(path, page?.canonical),
     }),
-    title: page?.meta?.title,
+    robots: page?.noindex ? noIndexFollowRobots : indexFollowRobots,
+    title: page?.meta?.title ?? page?.title,
   }
 }

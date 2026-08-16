@@ -65,17 +65,6 @@
   padding-bottom: 1rem;
 }
 
-.createPayloadApp {
-  display: flex;
-  padding: 1.5rem;
-  width: 100%;
-  @include code;
-
-  @include mid-break {
-    padding: 1rem;
-  }
-}
-
 .ctaWrapper {
   display: flex;
   height: 4.2rem;

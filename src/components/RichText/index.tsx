@@ -107,7 +107,7 @@ export const RichText: React.FC<Props> = ({ className, content }) => {
 
   return (
     <SerializedRichText
-      className={['payload-richtext', className].filter(Boolean).join(' ')}
+      className={['ecolitea-richtext', className].filter(Boolean).join(' ')}
       converters={jsxConverters}
       data={content}
     />

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import payload from 'payload'
+import ecoliteaCMS from 'payload'
 
 // eslint-disable-next-line
 require('dotenv').config()
@@ -11,10 +11,10 @@ const { MONGODB_URI, PAYLOAD_SECRET } = process.env
 // within each of your draft-enabled collections.
 
 const ensureAtLeastOneVersion = async (): Promise<void> => {
-  // Initialize Payload
+  // Initialize the Ecolitea CMS
   // IMPORTANT: make sure your ENV variables are filled properly here
   // as the below variable names are just for reference.
-  await payload.init({
+  await ecoliteaCMS.init({
     local: true,
     mongoURL: MONGODB_URI,
     secret: PAYLOAD_SECRET,
@@ -22,17 +22,17 @@ const ensureAtLeastOneVersion = async (): Promise<void> => {
 
   // For each collection
   await Promise.all(
-    payload.config.collections.map(async ({ slug, versions }) => {
+    ecoliteaCMS.config.collections.map(async ({ slug, versions }) => {
       // If drafts are enabled
       if (versions?.drafts) {
-        const { docs } = await payload.find({
+        const { docs } = await ecoliteaCMS.find({
           collection: slug,
           depth: 0,
           limit: 0,
           locale: 'all',
         })
 
-        const VersionsModel = payload.versions[slug]
+        const VersionsModel = ecoliteaCMS.versions[slug]
         const existingCollectionDocIds: string[] = []
         await Promise.all(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,13 +60,13 @@ const ensureAtLeastOneVersion = async (): Promise<void> => {
                   version: doc,
                 })
               } catch (e: unknown) {
-                payload.logger.error(
+                ecoliteaCMS.logger.error(
                   `Unable to create version corresponding with collection ${slug} document ID ${doc.id}`,
                   e?.errors || e,
                 )
               }
 
-              payload.logger.info(
+              ecoliteaCMS.logger.info(
                 `Created version corresponding with ${slug} document ID ${doc.id}`,
               )
             }
@@ -78,7 +78,7 @@ const ensureAtLeastOneVersion = async (): Promise<void> => {
         })
 
         if (versionsWithoutParentDocs.deletedCount > 0) {
-          payload.logger.info(
+          ecoliteaCMS.logger.info(
             `Removing ${versionsWithoutParentDocs.deletedCount} versions for ${slug} collection - parent documents no longer exist`,
           )
         }
@@ -86,7 +86,7 @@ const ensureAtLeastOneVersion = async (): Promise<void> => {
     }),
   )
 
-  payload.logger.info('Done!')
+  ecoliteaCMS.logger.info('Done!')
   process.exit(0)
 }
 

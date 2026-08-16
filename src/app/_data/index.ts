@@ -3,21 +3,14 @@ import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 
 import type {
-  Budget,
   CaseStudy,
   Category,
-  CommunityHelp,
   Footer,
   Form,
   GetStarted,
-  Industry,
   MainMenu,
   Page,
-  Partner,
-  PartnerProgram,
   Post,
-  Region,
-  Specialty,
   TopBar,
 } from '../../payload-types'
 
@@ -26,16 +19,16 @@ export const fetchGlobals = async (): Promise<{
   mainMenu: MainMenu
   topBar: TopBar
 }> => {
-  const payload = await getPayload({ config })
-  const mainMenu = await payload.findGlobal({
+  const ecoliteaCMS = await getPayload({ config })
+  const mainMenu = await ecoliteaCMS.findGlobal({
     slug: 'main-menu',
     depth: 1,
   })
-  const footer = await payload.findGlobal({
+  const footer = await ecoliteaCMS.findGlobal({
     slug: 'footer',
     depth: 1,
   })
-  const topBar = await payload.findGlobal({
+  const topBar = await ecoliteaCMS.findGlobal({
     slug: 'topBar',
     depth: 1,
   })
@@ -50,11 +43,11 @@ export const fetchGlobals = async (): Promise<{
 export const fetchPage = async (incomingSlugSegments: string[]): Promise<null | Page> => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
   const slugSegments = incomingSlugSegments || ['home']
   const slug = slugSegments.at(-1)
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'pages',
     depth: 2,
     draft,
@@ -97,13 +90,14 @@ export const fetchPage = async (incomingSlugSegments: string[]): Promise<null | 
 }
 
 export const fetchPages = async (): Promise<Partial<Page>[]> => {
-  const payload = await getPayload({ config })
-  const data = await payload.find({
+  const ecoliteaCMS = await getPayload({ config })
+  const data = await ecoliteaCMS.find({
     collection: 'pages',
     depth: 0,
     limit: 300,
     select: {
       breadcrumbs: true,
+      noindex: true,
     },
     where: {
       and: [
@@ -117,6 +111,11 @@ export const fetchPages = async (): Promise<Partial<Page>[]> => {
             equals: 'published',
           },
         },
+        {
+          noindex: {
+            not_equals: true,
+          },
+        },
       ],
     },
   })
@@ -125,14 +124,20 @@ export const fetchPages = async (): Promise<Partial<Page>[]> => {
 }
 
 export const fetchPosts = async (): Promise<Partial<Post>[]> => {
-  const payload = await getPayload({ config })
-  const data = await payload.find({
+  const ecoliteaCMS = await getPayload({ config })
+  const data = await ecoliteaCMS.find({
     collection: 'posts',
     depth: 1,
     limit: 300,
     select: {
       slug: true,
       category: true,
+      noindex: true,
+    },
+    where: {
+      noindex: {
+        not_equals: true,
+      },
     },
   })
 
@@ -141,9 +146,9 @@ export const fetchPosts = async (): Promise<Partial<Post>[]> => {
 
 export const fetchBlogPosts = async (): Promise<Partial<Post>[]> => {
   const currentDate = new Date()
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'posts',
     depth: 1,
     limit: 300,
@@ -156,17 +161,20 @@ export const fetchBlogPosts = async (): Promise<Partial<Post>[]> => {
     },
     sort: '-publishedOn',
     where: {
-      and: [{ publishedOn: { less_than_equal: currentDate } }, { _status: { equals: 'published' } }],
+      and: [
+        { publishedOn: { less_than_equal: currentDate } },
+        { _status: { equals: 'published' } },
+      ],
     },
   })
   return data.docs
 }
 
 export const fetchArchive = async (slug: string, draft?: boolean): Promise<Partial<Category>> => {
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
   const currentDate = new Date()
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'categories',
     depth: 2,
     draft,
@@ -174,7 +182,10 @@ export const fetchArchive = async (slug: string, draft?: boolean): Promise<Parti
       posts: {
         sort: '-publishedOn',
         where: {
-          and: [{ publishedOn: { less_than_equal: currentDate } }, { _status: { equals: 'published' } }],
+          and: [
+            { publishedOn: { less_than_equal: currentDate } },
+            { _status: { equals: 'published' } },
+          ],
         },
       },
     },
@@ -194,13 +205,27 @@ export const fetchArchive = async (slug: string, draft?: boolean): Promise<Parti
 }
 
 export const fetchArchives = async (slug?: string): Promise<Partial<Category>[]> => {
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
+  const currentDate = new Date()
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'categories',
     depth: 0,
+    joins: {
+      posts: {
+        limit: 1,
+        where: {
+          and: [
+            { publishedOn: { less_than_equal: currentDate } },
+            { _status: { equals: 'published' } },
+            { noindex: { not_equals: true } },
+          ],
+        },
+      },
+    },
     select: {
       name: true,
+      posts: true,
       slug: true,
     },
     sort: 'name',
@@ -213,14 +238,14 @@ export const fetchArchives = async (slug?: string): Promise<Partial<Category>[]>
     }),
   })
 
-  return data.docs
+  return data.docs.filter((category) => Boolean(category.posts?.docs?.length))
 }
 
 export const fetchBlogPost = async (slug: string, category): Promise<Partial<Post>> => {
   const { isEnabled: draft } = await draftMode()
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'posts',
     depth: 2,
     draft,
@@ -237,6 +262,8 @@ export const fetchBlogPost = async (slug: string, category): Promise<Partial<Pos
       guestSocials: true,
       image: true,
       meta: true,
+      canonical: true,
+      noindex: true,
       publishedOn: true,
       relatedPosts: true,
       title: true,
@@ -263,13 +290,19 @@ export const fetchBlogPost = async (slug: string, category): Promise<Partial<Pos
 }
 
 export const fetchCaseStudies = async (): Promise<Partial<CaseStudy>[]> => {
-  const payload = await getPayload({ config })
-  const data = await payload.find({
+  const ecoliteaCMS = await getPayload({ config })
+  const data = await ecoliteaCMS.find({
     collection: 'case-studies',
     depth: 0,
     limit: 300,
     select: {
       slug: true,
+      noindex: true,
+    },
+    where: {
+      noindex: {
+        not_equals: true,
+      },
     },
   })
 
@@ -278,9 +311,9 @@ export const fetchCaseStudies = async (): Promise<Partial<CaseStudy>[]> => {
 
 export const fetchCaseStudy = async (slug: string): Promise<CaseStudy> => {
   const { isEnabled: draft } = await draftMode()
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'case-studies',
     depth: 1,
     draft,
@@ -304,161 +337,9 @@ export const fetchCaseStudy = async (slug: string): Promise<CaseStudy> => {
   return data.docs[0]
 }
 
-export const fetchCommunityHelps = async (
-  communityHelpType: CommunityHelp['communityHelpType'],
-): Promise<Pick<CommunityHelp, 'slug'>[]> => {
-  const payload = await getPayload({ config })
-
-  const data = await payload.find({
-    collection: 'community-help',
-    depth: 0,
-    limit: 0,
-    select: { slug: true },
-    where: {
-      and: [{ communityHelpType: { equals: communityHelpType } }, { helpful: { equals: true } }],
-    },
-  })
-
-  return data.docs
-}
-
-export const fetchCommunityHelp = async (slug: string): Promise<CommunityHelp> => {
-  const payload = await getPayload({ config })
-
-  const data = await payload.find({
-    collection: 'community-help',
-    limit: 1,
-    where: { slug: { equals: slug } },
-  })
-
-  return data.docs[0]
-}
-
-export const fetchPartners = async (): Promise<Partner[]> => {
-  const payload = await getPayload({ config })
-
-  const data = await payload.find({
-    collection: 'partners',
-    depth: 2,
-    limit: 300,
-    overrideAccess: false, // Respect field-level access control (excludes email and hubspotID)
-    sort: 'slug',
-    where: {
-      AND: [{ agency_status: { equals: 'active' } }, { _status: { equals: 'published' } }],
-    },
-  })
-
-  return data.docs
-}
-
-export const fetchPartner = async (slug: string): Promise<Partial<Partner>> => {
-  const { isEnabled: draft } = await draftMode()
-  const payload = await getPayload({ config })
-
-  const data = await payload.find({
-    collection: 'partners',
-    depth: 2,
-    draft,
-    limit: 1,
-    populate: {
-      'case-studies': {
-        slug: true,
-        featuredImage: true,
-        meta: {
-          description: true,
-        },
-        title: true,
-      },
-    },
-    select: {
-      name: true,
-      budgets: true,
-      city: true,
-      content: {
-        bannerImage: true,
-        caseStudy: true,
-        contributions: true,
-        idealProject: true,
-        overview: true,
-        projects: true,
-        services: true,
-      },
-      featured: true,
-      industries: true,
-      regions: true,
-      social: true,
-      specialties: true,
-      topContributor: true,
-      website: true,
-    },
-    where: {
-      and: [
-        { slug: { equals: slug } },
-        ...(draft
-          ? []
-          : [
-              {
-                _status: {
-                  equals: 'published',
-                },
-              },
-            ]),
-      ],
-    },
-  })
-
-  return data.docs[0]
-}
-
-export const fetchPartnerProgram = async (): Promise<Partial<PartnerProgram>> => {
-  const payload = await getPayload({ config })
-  const data = await payload.findGlobal({
-    slug: 'partner-program',
-    depth: 2,
-  })
-
-  return data
-}
-
-export const fetchFilters = async (): Promise<{
-  budgets: Budget[]
-  industries: Industry[]
-  regions: Region[]
-  specialties: Specialty[]
-}> => {
-  const payload = await getPayload({ config })
-
-  const industries = await payload.find({
-    collection: 'industries',
-    limit: 100,
-  })
-
-  const specialties = await payload.find({
-    collection: 'specialties',
-    limit: 100,
-  })
-
-  const regions = await payload.find({
-    collection: 'regions',
-    limit: 100,
-  })
-
-  const budgets = await payload.find({
-    collection: 'budgets',
-    limit: 100,
-  })
-
-  return {
-    budgets: budgets.docs,
-    industries: industries.docs,
-    regions: regions.docs,
-    specialties: specialties.docs,
-  }
-}
-
 export const fetchGetStarted = async (): Promise<GetStarted> => {
-  const payload = await getPayload({ config })
-  const data = await payload.findGlobal({
+  const ecoliteaCMS = await getPayload({ config })
+  const data = await ecoliteaCMS.findGlobal({
     slug: 'get-started',
     depth: 1,
   })
@@ -467,9 +348,9 @@ export const fetchGetStarted = async (): Promise<GetStarted> => {
 }
 
 export const fetchForm = async (name: string): Promise<Form> => {
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
 
-  const data = await payload.find({
+  const data = await ecoliteaCMS.find({
     collection: 'forms',
     depth: 1,
     limit: 1,

@@ -58,7 +58,7 @@ export const Users: CollectionConfig = {
       name: 'twitter',
       type: 'text',
       admin: {
-        description: 'Example: `payloadcms`',
+        description: 'Example: `ecolitea`',
       },
       label: 'Twitter Handle',
     },

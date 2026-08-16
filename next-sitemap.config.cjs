@@ -1,5 +1,14 @@
 module.exports = {
-  siteUrl: process.env.SITEMAP_URL || 'https://payloadcms.com',
+  siteUrl: 'https://ecolitea.com',
+  exclude: ['/admin*', '/api*', '/preview*', '/thanks-for-subscribing'],
   generateRobotsTxt: true, // (optional)
-  // ...other options
+  robotsTxtOptions: {
+    policies: [
+      {
+        allow: '/',
+        disallow: ['/admin/', '/api/', '/preview/'],
+        userAgent: '*',
+      },
+    ],
+  },
 }

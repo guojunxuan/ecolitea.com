@@ -9,14 +9,12 @@ import BreadcrumbsBar from '@components/Hero/BreadcrumbsBar/index'
 import { Media } from '@components/Media/index'
 import { RenderBlocks } from '@components/RenderBlocks/index'
 import { RichText } from '@components/RichText/index'
-import { ArrowIcon } from '@icons/ArrowIcon'
-import Link from 'next/link'
 import React from 'react'
 
 import classes from './index.module.scss'
 
 export const CaseStudy: React.FC<CaseStudyT> = (props) => {
-  const { featuredImage, industry, introContent, layout, partner, title, url, useCase } = props
+  const { featuredImage, industry, introContent, layout, title, url, useCase } = props
 
   return (
     <React.Fragment>
@@ -65,18 +63,6 @@ export const CaseStudy: React.FC<CaseStudyT> = (props) => {
                       <p className={[classes.metaLabel].filter(Boolean).join(' ')}>Use case</p>
                       <p className={[classes.metaValue].filter(Boolean).join(' ')}>{useCase}</p>
                     </div>
-                  )}
-                  {partner && typeof partner !== 'string' && (
-                    <Link
-                      className={[classes.metaItem].filter(Boolean).join(' ')}
-                      href={'/partners/' + partner.slug}
-                    >
-                      <p className={[classes.metaLabel].filter(Boolean).join(' ')}>Partner</p>
-                      <p className={[classes.metaValue].filter(Boolean).join(' ')}>
-                        {partner.name}
-                      </p>
-                      <ArrowIcon className={classes.arrow} />
-                    </Link>
                   )}
                 </div>
               )}

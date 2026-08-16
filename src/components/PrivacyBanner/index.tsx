@@ -37,9 +37,8 @@ export const PrivacyBanner: React.FC = () => {
     >
       <div className={classes.contentWrap}>
         <p className={classes.content}>
-          We use cookies, subject to your consent, to analyze the use of our website and to ensure
-          you get the best experience. Third parties with whom we collaborate can also install
-          cookies in order to show you personalized advertisements on other websites. Read our{' '}
+          We use optional analytics cookies, with your consent, to understand how our website is
+          used and improve your experience. Read our{' '}
           <Link className={classes.privacyLink} href="/cookie" prefetch={false}>
             cookie policy
           </Link>{' '}

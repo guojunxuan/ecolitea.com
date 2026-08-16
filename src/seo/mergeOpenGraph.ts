@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 
+import { brandMetadata } from './brandMetadata'
+
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description:
-    'Payload is a headless CMS and application framework built with TypeScript, Node.js, React and MongoDB',
+  description: brandMetadata.openGraph.description,
   images: [
     {
       url: '/images/og-image.jpg',
     },
   ],
-  siteName: 'Payload',
-  title: 'Payload',
+  siteName: brandMetadata.name,
+  title: brandMetadata.openGraph.title,
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {

@@ -22,6 +22,8 @@ caddy/config/
 .playwright-cli/
 .pnpm-store/
 .claude/
+.superpowers/
+*.tsbuildinfo
 
 # Local media uploads (production media lives in Cloudflare R2)
 # Leading slash anchors to repo root so src/components/Media and src/blocks/Media stay tracked

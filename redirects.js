@@ -3,8 +3,14 @@ import { formatPermalink } from './src/utilities/formatPermalink.js'
 export const redirects = async () => {
   const staticRedirects = [
     {
-      source: '/roadmap',
-      destination: 'https://github.com/payloadcms/payload/discussions/categories/roadmap',
+      source: '/:path*',
+      has: [
+        {
+          type: 'host',
+          value: 'www.ecolitea.com',
+        },
+      ],
+      destination: 'https://ecolitea.com/:path*',
       permanent: true,
     },
     {

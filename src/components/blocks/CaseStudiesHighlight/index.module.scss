@@ -19,45 +19,6 @@
   margin-left: -25vw;
 }
 
-.poweredByPayload {
-  position: absolute;
-  top: 4rem;
-  z-index: 1;
-  width: 100%;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-
-  @include mid-break {
-    top: 1rem;
-  }
-}
-
-.poweredByPayloadInner {
-  @include large-body;
-  & {
-    @include shadow-lg;
-    & {
-      background: var(--theme-bg);
-      padding: 1.5rem 2.5rem;
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      border-bottom: 4px solid;
-    }
-  }
-
-  svg {
-    margin-right: 0.75rem;
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  @include mid-break {
-    padding: 1rem 2rem;
-  }
-}
-
 .row {
   display: flex;
   list-style: none;

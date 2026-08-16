@@ -5,12 +5,16 @@ import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-import { EXPERIMENTAL_TableFeature, lexicalEditor, LinkFeature, UploadFeature } from '@payloadcms/richtext-lexical'
+import {
+  EXPERIMENTAL_TableFeature,
+  lexicalEditor,
+  LinkFeature,
+  UploadFeature,
+} from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import link from '@root/fields/link'
 import { LabelFeature } from '@root/fields/richText/features/label/server'
 import { LargeBodyFeature } from '@root/fields/richText/features/largeBody/server'
-import { googleAnalytics } from '@zubricks/plugin-google-analytics'
 import { revalidateTag } from 'next/cache'
 import nodemailerSendgrid from 'nodemailer-sendgrid'
 import path from 'path'
@@ -49,35 +53,33 @@ import { Steps } from './blocks/Steps'
 import { StickyHighlights } from './blocks/StickyHighlights'
 import { CaseStudies } from './collections/CaseStudies'
 import { Categories } from './collections/Categories'
-import { CommunityHelp } from './collections/CommunityHelp'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
-import { Budgets, Industries, Regions, Specialties } from './collections/PartnerFilters'
-import { Partners } from './collections/Partners'
 import { Posts } from './collections/Posts'
 import { ReusableContent } from './collections/ReusableContent'
 import { Users } from './collections/Users'
 import { Footer } from './globals/Footer'
 import { GetStarted } from './globals/GetStarted'
 import { MainMenu } from './globals/MainMenu'
-import { PartnerProgram } from './globals/PartnerProgram'
 import { TopBar } from './globals/TopBar'
 import { opsCounterPlugin } from './plugins/opsCounter'
-import { featureFlags } from './features'
-import createReleasePost from './scripts/createReleasePost'
-import createReleasePostFromAdmin from './scripts/createReleasePostFromAdmin'
+import { externalServices, getAllowedOrigins } from './config/externalServices'
 import redeployWebsite from './scripts/redeployWebsite'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const sendGridAPIKey = process.env.SENDGRID_API_KEY
-
-const sendgridConfig = {
-  transportOptions: nodemailerSendgrid({
-    apiKey: sendGridAPIKey,
-  }),
-}
+const emailAdapter =
+  sendGridAPIKey && externalServices.email.fromAddress
+    ? nodemailerAdapter({
+        defaultFromAddress: externalServices.email.fromAddress,
+        defaultFromName: externalServices.email.fromName,
+        transportOptions: nodemailerSendgrid({
+          apiKey: sendGridAPIKey,
+        }),
+      })
+    : undefined
 
 const requiredR2Variables = [
   'R2_BUCKET',
@@ -91,17 +93,16 @@ const isR2Configured = requiredR2Variables.every((variable) => Boolean(process.e
 
 export default buildConfig({
   admin: {
-    autoLogin: {
-      email: 'dev2@payloadcms.com',
-      password: 'test',
-    },
     components: {
-      // Temporarily disabled: Payload docs, community, and release-note admin actions.
-      // afterNavLinks: ['@root/components/AfterNavActions'],
-      // beforeDashboard: ['@root/components/BeforeDashboard'],
+      graphics: {
+        Logo: '@root/components/AdminLogo',
+      },
     },
     importMap: {
       baseDir: dirname,
+    },
+    meta: {
+      titleSuffix: '- Ecolitea',
     },
   },
   blocks: [
@@ -223,22 +224,11 @@ export default buildConfig({
     },
     Code,
   ],
-  collections: [
-    CaseStudies,
-    CommunityHelp,
-    Media,
-    Pages,
-    Posts,
-    Categories,
-    ReusableContent,
-    Users,
-    Partners,
-    Industries,
-    Specialties,
-    Regions,
-    Budgets,
-  ],
-  cors: [process.env.PAYLOAD_PUBLIC_APP_URL || '', 'https://payloadcms.com', 'https://discord.com/api'].filter(Boolean),
+  collections: [CaseStudies, Media, Pages, Posts, Categories, ReusableContent, Users],
+  cors: getAllowedOrigins(
+    process.env.NODE_ENV === 'production',
+    process.env.PAYLOAD_PUBLIC_APP_URL,
+  ),
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
@@ -290,29 +280,15 @@ export default buildConfig({
       LargeBodyFeature(),
     ],
   }),
-  email: nodemailerAdapter({
-    defaultFromAddress: 'info@payloadcms.com',
-    defaultFromName: 'Payload',
-    ...sendgridConfig,
-  }),
+  ...(emailAdapter ? { email: emailAdapter } : {}),
   endpoints: [
     {
       handler: redeployWebsite,
       method: 'post',
       path: '/redeploy/website',
     },
-    {
-      handler: createReleasePost,
-      method: 'post',
-      path: '/create-release-post',
-    },
-    {
-      handler: createReleasePostFromAdmin,
-      method: 'post',
-      path: '/create-release-post-from-admin',
-    },
   ],
-  globals: [Footer, MainMenu, GetStarted, PartnerProgram, TopBar],
+  globals: [Footer, MainMenu, GetStarted, TopBar],
   graphQL: {
     disablePlaygroundInProduction: false,
   },
@@ -320,10 +296,6 @@ export default buildConfig({
     opsCounterPlugin({
       max: 200,
       warnAt: 25,
-    }),
-    googleAnalytics({
-      // Optional: Configure which widgets to enable
-      enabledWidgets: ['analytics-overview', 'top-pages', 'active-users', 'channel-groups'],
     }),
     formBuilderPlugin({
       formOverrides: {
@@ -411,7 +383,9 @@ export default buildConfig({
                 const portalID = process.env.NEXT_PRIVATE_HUBSPOT_PORTAL_KEY
 
                 // Remove partnerId from HubSpot submission (toEmail already populated by beforeChange hook)
-                const submissionData = submissionDataFromDoc.filter((field) => field.field !== 'partnerId')
+                const submissionData = submissionDataFromDoc.filter(
+                  (field) => field.field !== 'partnerId',
+                )
 
                 const data = {
                   context: {
@@ -446,38 +420,6 @@ export default buildConfig({
                 }
               }
               await sendSubmissionToHubSpot()
-            },
-          ],
-          beforeChange: [
-            async ({ data, req }) => {
-              // Look up partner email if partnerId is present and populate toEmail field
-              // This runs before email notifications are sent
-              const partnerIdField = data?.submissionData?.find((field) => field.field === 'partnerId')
-
-              if (partnerIdField?.value) {
-                try {
-                  const partner = await req.payload.findByID({
-                    id: partnerIdField.value,
-                    collection: 'partners',
-                    overrideAccess: true,
-                  })
-
-                  if (partner?.email) {
-                    // Add toEmail field to submissionData for email notifications
-                    data.submissionData.push({
-                      field: 'toEmail',
-                      value: partner.email,
-                    })
-                  }
-                } catch (err) {
-                  req.payload.logger.error({
-                    err,
-                    msg: 'Failed to lookup partner email',
-                  })
-                }
-              }
-
-              return data
             },
           ],
         },

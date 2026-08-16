@@ -123,9 +123,6 @@ export const hero: Field = {
       },
     },
     linkGroup({
-      additions: {
-        npmCta: true,
-      },
       appearances: false,
       overrides: {
         name: 'primaryButtons',
@@ -204,7 +201,7 @@ export const hero: Field = {
       admin: {
         condition: (_, { type, threeCTA }) => type === 'three' && threeCTA === 'buttons',
       },
-      blockReferences: ['link', 'command'],
+      blockReferences: ['link'],
       blocks: [],
       labels: {
         plural: 'Buttons',

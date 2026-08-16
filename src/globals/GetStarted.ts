@@ -40,7 +40,7 @@ export const GetStarted: GlobalConfig = {
             {
               name: 'heading',
               type: 'text',
-              defaultValue: 'Get started with Payload',
+              defaultValue: 'Get started with Ecolitea',
               label: 'Page Heading',
             },
             {

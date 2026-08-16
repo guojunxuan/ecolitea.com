@@ -19,17 +19,17 @@ export async function GET(req: NextRequest): Promise<Response> {
     return new Response('Invalid secret', { status: 401 })
   }
 
-  const payload = await getPayload({ config: configPromise })
+  const ecoliteaCMS = await getPayload({ config: configPromise })
 
   let user
 
   try {
-    user = await payload.auth({
+    user = await ecoliteaCMS.auth({
       headers: req.headers,
       req: req as unknown as PayloadRequest,
     })
   } catch (err) {
-    payload.logger.error({ err, msg: 'Error verifying token for preview' })
+    ecoliteaCMS.logger.error({ err, msg: 'Error verifying token for preview' })
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 

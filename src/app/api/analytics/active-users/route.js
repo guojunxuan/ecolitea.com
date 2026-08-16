@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { MOCK_ACTIVE_USERS } from '../mockData';
 export async function GET(request) {
+    if (process.env.ENABLE_ANALYTICS_DASHBOARD !== 'true') {
+        return new NextResponse(null, { status: 404 });
+    }
     try {
         const useDemoData = process.env.GA_USE_DEMO_DATA === 'true';
         if (useDemoData) {

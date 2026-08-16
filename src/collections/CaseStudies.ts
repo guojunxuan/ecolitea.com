@@ -1,4 +1,3 @@
-// import { slateEditor } from '@payloadcms/richtext-slate'
 import type { CollectionConfig } from 'payload'
 
 import { revalidatePath } from 'next/cache'
@@ -6,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { isAdmin } from '../access/isAdmin'
 import { publishedOnly } from '../access/publishedOnly'
 import richText from '../fields/richText'
+import { seoOverrideFields } from '../fields/seoOverrides'
 import { slugField } from '../fields/slug'
 import { formatPreviewURL } from '../utilities/formatPreviewURL'
 
@@ -54,11 +54,6 @@ export const CaseStudies: CollectionConfig = {
       ],
     },
     {
-      name: 'partner',
-      type: 'relationship',
-      relationTo: 'partners',
-    },
-    {
       name: 'featuredImage',
       type: 'upload',
       relationTo: 'media',
@@ -96,6 +91,7 @@ export const CaseStudies: CollectionConfig = {
       blocks: [],
     },
     slugField(),
+    ...seoOverrideFields,
     {
       name: 'url',
       type: 'text',

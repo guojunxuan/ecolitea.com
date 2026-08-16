@@ -106,18 +106,12 @@ export interface Config {
   };
   collections: {
     'case-studies': CaseStudy;
-    'community-help': CommunityHelp;
     media: Media;
     pages: Page;
     posts: Post;
     categories: Category;
     'reusable-content': ReusableContent;
     users: User;
-    partners: Partner;
-    industries: Industry;
-    specialties: Specialty;
-    regions: Region;
-    budgets: Budget;
     forms: Form;
     'form-submissions': FormSubmission;
     redirects: Redirect;
@@ -133,18 +127,12 @@ export interface Config {
   };
   collectionsSelect: {
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
-    'community-help': CommunityHelpSelect<false> | CommunityHelpSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'reusable-content': ReusableContentSelect<false> | ReusableContentSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    partners: PartnersSelect<false> | PartnersSelect<true>;
-    industries: IndustriesSelect<false> | IndustriesSelect<true>;
-    specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
-    regions: RegionsSelect<false> | RegionsSelect<true>;
-    budgets: BudgetsSelect<false> | BudgetsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -161,14 +149,12 @@ export interface Config {
     footer: Footer;
     'main-menu': MainMenu;
     'get-started': GetStarted;
-    'partner-program': PartnerProgram;
     topBar: TopBar;
   };
   globalsSelect: {
     footer: FooterSelect<false> | FooterSelect<true>;
     'main-menu': MainMenuSelect<false> | MainMenuSelect<true>;
     'get-started': GetStartedSelect<false> | GetStartedSelect<true>;
-    'partner-program': PartnerProgramSelect<false> | PartnerProgramSelect<true>;
     topBar: TopBarSelect<false> | TopBarSelect<true>;
   };
   locale: null;
@@ -385,11 +371,7 @@ export interface Cta {
     commandLine?: string | null;
     links?:
       | {
-          type?: ('link' | 'npmCta') | null;
-          npmCta?: {
-            label: string;
-          };
-          link?: {
+          link: {
             type?: ('reference' | 'custom') | null;
             newTab?: boolean | null;
             reference?:
@@ -447,7 +429,14 @@ export interface Page {
   id: string;
   title: string;
   fullTitle?: string | null;
+  /**
+   * Prevent this content from appearing in search results.
+   */
   noindex?: boolean | null;
+  /**
+   * Optional canonical URL override. Only absolute https://ecolitea.com URLs are accepted by the frontend.
+   */
+  canonical?: string | null;
   hero: {
     type:
       | 'default'
@@ -571,11 +560,7 @@ export interface Page {
     } | null;
     primaryButtons?:
       | {
-          type?: ('link' | 'npmCta') | null;
-          npmCta?: {
-            label: string;
-          };
-          link?: {
+          link: {
             type?: ('reference' | 'custom') | null;
             newTab?: boolean | null;
             reference?:
@@ -662,7 +647,7 @@ export interface Page {
       placeholder?: string | null;
       description?: string | null;
     };
-    buttons?: (Link | Command)[] | null;
+    buttons?: Link[] | null;
     secondaryButtons?:
       | {
           link: {
@@ -840,6 +825,14 @@ export interface Post {
   )[];
   relatedPosts?: (string | Post)[] | null;
   slug?: string | null;
+  /**
+   * Prevent this content from appearing in search results.
+   */
+  noindex?: boolean | null;
+  /**
+   * Optional canonical URL override. Only absolute https://ecolitea.com URLs are accepted by the frontend.
+   */
+  canonical?: string | null;
   authorType?: ('guest' | 'team') | null;
   authors?: (string | User)[] | null;
   guestAuthor?: string | null;
@@ -967,7 +960,6 @@ export interface CaseStudy {
   };
   industry?: string | null;
   useCase?: string | null;
-  partner?: (string | null) | Partner;
   featuredImage: string | Media;
   layout?:
     | (
@@ -998,6 +990,14 @@ export interface CaseStudy {
       )[]
     | null;
   slug?: string | null;
+  /**
+   * Prevent this content from appearing in search results.
+   */
+  noindex?: boolean | null;
+  /**
+   * Optional canonical URL override. Only absolute https://ecolitea.com URLs are accepted by the frontend.
+   */
+  canonical?: string | null;
   url?: string | null;
   meta?: {
     title?: string | null;
@@ -1010,170 +1010,6 @@ export interface CaseStudy {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners".
- */
-export interface Partner {
-  id: string;
-  name: string;
-  website: string;
-  email: string;
-  slug: string;
-  /**
-   * Set to inactive to hide this partner from the directory.
-   */
-  agency_status?: ('active' | 'inactive') | null;
-  hubspotID?: string | null;
-  logo: string | Media;
-  /**
-   * This field is managed by the Featured Partners field in the Partner Program collection
-   */
-  featured?: boolean | null;
-  topContributor?: boolean | null;
-  content: {
-    /**
-     * 1600 x 800px recommended
-     */
-    bannerImage: string | Media;
-    overview: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    services: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    idealProject: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    };
-    caseStudy?: (string | null) | CaseStudy;
-    /**
-     * Contributions to Payload. Must be a valid GitHub issue, pull request, or discussion URL from a repo in the 'payloadcms' organization.
-     */
-    contributions?:
-      | {
-          type: 'discussion' | 'pr' | 'issue';
-          repo: string;
-          number: number;
-          id?: string | null;
-        }[]
-      | null;
-    projects?:
-      | {
-          year: number;
-          name: string;
-          link: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  city: string;
-  regions: (string | Region)[];
-  specialties: (string | Specialty)[];
-  budgets: (string | Budget)[];
-  industries: (string | Industry)[];
-  social?:
-    | {
-        platform: 'linkedin' | 'twitter' | 'facebook' | 'instagram' | 'youtube' | 'github';
-        url: string;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "regions".
- */
-export interface Region {
-  id: string;
-  name: string;
-  /**
-   * Must contain only lowercase letters, numbers, hyphens, and underscores
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties".
- */
-export interface Specialty {
-  id: string;
-  name: string;
-  /**
-   * Must contain only lowercase letters, numbers, hyphens, and underscores
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgets".
- */
-export interface Budget {
-  id: string;
-  name: string;
-  /**
-   * Must contain only lowercase letters, numbers, hyphens, and underscores
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries".
- */
-export interface Industry {
-  id: string;
-  name: string;
-  /**
-   * Must contain only lowercase letters, numbers, hyphens, and underscores
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2294,7 +2130,6 @@ export interface Pricing {
       | {
           name: string;
           hasPrice?: boolean | null;
-          enableCreatePayload?: boolean | null;
           price?: string | null;
           title?: string | null;
           description?: string | null;
@@ -2823,7 +2658,7 @@ export interface User {
   firstName: string;
   lastName: string;
   /**
-   * Example: `payloadcms`
+   * Example: `ecolitea`
    */
   twitter?: string | null;
   photo?: (string | null) | Media;
@@ -2878,16 +2713,6 @@ export interface Link {
   id?: string | null;
   blockName?: string | null;
   blockType: 'link';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "command".
- */
-export interface Command {
-  command: string;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'command';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2973,29 +2798,13 @@ export interface CommandLineBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "community-help".
+ * via the `definition` "command".
  */
-export interface CommunityHelp {
-  id: string;
-  title?: string | null;
-  communityHelpType?: ('discord' | 'github') | null;
-  githubID?: string | null;
-  discordID?: string | null;
-  communityHelpJSON:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  introDescription?: string | null;
-  slug?: string | null;
-  helpful?: boolean | null;
-  threadCreatedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
+export interface Command {
+  command: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'command';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3071,10 +2880,6 @@ export interface PayloadLockedDocument {
         value: string | CaseStudy;
       } | null)
     | ({
-        relationTo: 'community-help';
-        value: string | CommunityHelp;
-      } | null)
-    | ({
         relationTo: 'media';
         value: string | Media;
       } | null)
@@ -3097,26 +2902,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: string | User;
-      } | null)
-    | ({
-        relationTo: 'partners';
-        value: string | Partner;
-      } | null)
-    | ({
-        relationTo: 'industries';
-        value: string | Industry;
-      } | null)
-    | ({
-        relationTo: 'specialties';
-        value: string | Specialty;
-      } | null)
-    | ({
-        relationTo: 'regions';
-        value: string | Region;
-      } | null)
-    | ({
-        relationTo: 'budgets';
-        value: string | Budget;
       } | null)
     | ({
         relationTo: 'forms';
@@ -3181,10 +2966,11 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   introContent?: T;
   industry?: T;
   useCase?: T;
-  partner?: T;
   featuredImage?: T;
   layout?: T | {};
   slug?: T;
+  noindex?: T;
+  canonical?: T;
   url?: T;
   meta?:
     | T
@@ -3196,23 +2982,6 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "community-help_select".
- */
-export interface CommunityHelpSelect<T extends boolean = true> {
-  title?: T;
-  communityHelpType?: T;
-  githubID?: T;
-  discordID?: T;
-  communityHelpJSON?: T;
-  introDescription?: T;
-  slug?: T;
-  helpful?: T;
-  threadCreatedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3265,6 +3034,7 @@ export interface PagesSelect<T extends boolean = true> {
   title?: T;
   fullTitle?: T;
   noindex?: T;
+  canonical?: T;
   hero?:
     | T
     | {
@@ -3319,12 +3089,6 @@ export interface PagesSelect<T extends boolean = true> {
         primaryButtons?:
           | T
           | {
-              type?: T;
-              npmCta?:
-                | T
-                | {
-                    label?: T;
-                  };
               link?:
                 | T
                 | {
@@ -3459,6 +3223,8 @@ export interface PostsSelect<T extends boolean = true> {
       };
   relatedPosts?: T;
   slug?: T;
+  noindex?: T;
+  canonical?: T;
   authorType?: T;
   authors?: T;
   guestAuthor?: T;
@@ -3553,101 +3319,6 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners_select".
- */
-export interface PartnersSelect<T extends boolean = true> {
-  name?: T;
-  website?: T;
-  email?: T;
-  slug?: T;
-  agency_status?: T;
-  hubspotID?: T;
-  logo?: T;
-  featured?: T;
-  topContributor?: T;
-  content?:
-    | T
-    | {
-        bannerImage?: T;
-        overview?: T;
-        services?: T;
-        idealProject?: T;
-        caseStudy?: T;
-        contributions?:
-          | T
-          | {
-              type?: T;
-              repo?: T;
-              number?: T;
-              id?: T;
-            };
-        projects?:
-          | T
-          | {
-              year?: T;
-              name?: T;
-              link?: T;
-              id?: T;
-            };
-      };
-  city?: T;
-  regions?: T;
-  specialties?: T;
-  budgets?: T;
-  industries?: T;
-  social?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries_select".
- */
-export interface IndustriesSelect<T extends boolean = true> {
-  name?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties_select".
- */
-export interface SpecialtiesSelect<T extends boolean = true> {
-  name?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "regions_select".
- */
-export interface RegionsSelect<T extends boolean = true> {
-  name?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "budgets_select".
- */
-export interface BudgetsSelect<T extends boolean = true> {
-  name?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4223,148 +3894,6 @@ export interface GetStarted {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partner-program".
- */
-export interface PartnerProgram {
-  id: string;
-  /**
-   * Select the form that should be used for the contact form.
-   */
-  contactForm: string | Form;
-  hero?: {
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    breadcrumbBarLinks?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: string | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: string | Post;
-                } | null)
-              | ({
-                  relationTo: 'case-studies';
-                  value: string | CaseStudy;
-                } | null);
-            url?: string | null;
-            label: string;
-            customId?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    heroLinks?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: string | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: string | Post;
-                } | null)
-              | ({
-                  relationTo: 'case-studies';
-                  value: string | CaseStudy;
-                } | null);
-            url?: string | null;
-            label: string;
-            customId?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-  };
-  featuredPartners: {
-    description?: string | null;
-    partners: (string | Partner)[];
-  };
-  contentBlocks?: {
-    beforeDirectory?:
-      | (
-          | Callout
-          | Cta
-          | CardGrid
-          | CaseStudyCards
-          | CaseStudiesHighlight
-          | CaseStudyParallax
-          | CodeFeature
-          | Content
-          | ContentGrid
-          | FormBlock
-          | HoverCards
-          | HoverHighlights
-          | LinkGrid
-          | LogoGrid
-          | MediaBlock
-          | MediaContent
-          | MediaContentAccordion
-          | Pricing
-          | ReusableContentBlock
-          | Slider
-          | Statement
-          | StepsBlock
-          | StickyHighlights
-          | ExampleTabsBlock
-        )[]
-      | null;
-    afterDirectory?:
-      | (
-          | Callout
-          | Cta
-          | CardGrid
-          | CaseStudyCards
-          | CaseStudiesHighlight
-          | CaseStudyParallax
-          | CodeFeature
-          | Content
-          | ContentGrid
-          | FormBlock
-          | HoverCards
-          | HoverHighlights
-          | LinkGrid
-          | LogoGrid
-          | MediaBlock
-          | MediaContent
-          | MediaContentAccordion
-          | Pricing
-          | ReusableContentBlock
-          | Slider
-          | Statement
-          | StepsBlock
-          | StickyHighlights
-          | ExampleTabsBlock
-        )[]
-      | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "topBar".
  */
 export interface TopBar {
@@ -4624,63 +4153,6 @@ export interface GetStartedSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         image?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partner-program_select".
- */
-export interface PartnerProgramSelect<T extends boolean = true> {
-  contactForm?: T;
-  hero?:
-    | T
-    | {
-        richText?: T;
-        breadcrumbBarLinks?:
-          | T
-          | {
-              link?:
-                | T
-                | {
-                    type?: T;
-                    newTab?: T;
-                    reference?: T;
-                    url?: T;
-                    label?: T;
-                    customId?: T;
-                  };
-              id?: T;
-            };
-        heroLinks?:
-          | T
-          | {
-              link?:
-                | T
-                | {
-                    type?: T;
-                    newTab?: T;
-                    reference?: T;
-                    url?: T;
-                    label?: T;
-                    customId?: T;
-                  };
-              id?: T;
-            };
-      };
-  featuredPartners?:
-    | T
-    | {
-        description?: T;
-        partners?: T;
-      };
-  contentBlocks?:
-    | T
-    | {
-        beforeDirectory?: T | {};
-        afterDirectory?: T | {};
       };
   updatedAt?: T;
   createdAt?: T;

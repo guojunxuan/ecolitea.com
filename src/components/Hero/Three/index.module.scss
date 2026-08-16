@@ -100,18 +100,6 @@
   }
 }
 
-.createPayloadApp {
-  display: flex;
-  justify-content: space-between;
-  padding: 1.5rem;
-  width: 100%;
-  @include code;
-
-  @include mid-break {
-    padding: 1rem;
-  }
-}
-
 .backgroundGradient {
   position: fixed;
 

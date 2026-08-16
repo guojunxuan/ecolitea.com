@@ -49,36 +49,18 @@ const PrivacyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
   )
 
   useEffect(() => {
-    ;(async () => {
-      const consent = getLocaleStorage()
-      if (consent) {
-        setCountry(consent.country)
-        setCookieConsent(consent.accepted || false)
-        return
-      }
-      const gdpr = await fetch('/api/locate').then((res) => res.json())
+    const consent = getLocaleStorage()
+    if (consent) {
+      setCountry(consent.country)
+      setCookieConsent(consent.accepted)
+      setShowConsent(false)
+      return
+    }
 
-      setCountry(gdpr.country || '')
-      if (!gdpr.isGDPR) {
-        setCookieConsent(true)
-        updateCookieConsent(true)
-      }
-      setShowConsent(gdpr.isGDPR || false)
-    })().catch(console.error)
-  }, [updateCookieConsent])
-
-  useEffect(() => {
-    import('react-facebook-pixel')
-      .then((x) => x.default)
-      .then((ReactPixel) => {
-        if (cookieConsent) {
-          ReactPixel.grantConsent()
-        } else {
-          ReactPixel.revokeConsent()
-        }
-      })
-      .catch(console.error)
-  }, [cookieConsent])
+    setCountry('')
+    setCookieConsent(false)
+    setShowConsent(true)
+  }, [])
 
   return (
     <Context value={{ cookieConsent, country, showConsent, updateCookieConsent }}>

@@ -1,8 +1,8 @@
-.payload-toast-container {
+.ecolitea-toast-container {
   padding: 0;
   margin: 0;
 
-  .payload-toast-close-button {
+  .ecolitea-toast-close-button {
     position: absolute;
     top: 0;
     left: 0;
@@ -26,7 +26,7 @@
     margin-right: 1rem;
   }
 
-  .payload-toast-item {
+  .ecolitea-toast-item {
     padding: 0.8rem;
     color: var(--theme-elevation-800);
     font-style: normal;
@@ -79,7 +79,7 @@
       border-color: var(--theme-warning-700);
       background-color: var(--theme-warning-900);
 
-      .payload-toast-close-button {
+      .ecolitea-toast-close-button {
         color: var(--theme-warning-600);
       }
     }
@@ -89,7 +89,7 @@
       border-color: var(--theme-error-700);
       background-color: var(--theme-error-900);
 
-      .payload-toast-close-button {
+      .ecolitea-toast-close-button {
         color: var(--theme-error-600);
       }
     }
@@ -99,7 +99,7 @@
       border-color: var(--theme-success-700);
       background-color: var(--theme-success-900);
 
-      .payload-toast-close-button {
+      .ecolitea-toast-close-button {
         color: var(--theme-elevation-600);
       }
     }
@@ -109,7 +109,7 @@
       border-color: var(--theme-elevation-250);
       background-color: var(--theme-elevation-100);
 
-      .payload-toast-close-button {
+      .ecolitea-toast-close-button {
         color: var(--theme-elevation-600);
       }
     }

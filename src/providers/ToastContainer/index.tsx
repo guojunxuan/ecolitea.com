@@ -10,7 +10,7 @@ import { Warning } from './icons/Warning'
 export function ToastContainer() {
   return (
     <Toaster
-      className="payload-toast-container"
+      className="ecolitea-toast-container"
       closeButton
       // @ts-expect-error
       dir="undefined"
@@ -24,14 +24,14 @@ export function ToastContainer() {
       offset="calc(var(--gutter-h) / 4)"
       toastOptions={{
         classNames: {
-          closeButton: 'payload-toast-close-button',
+          closeButton: 'ecolitea-toast-close-button',
           content: 'toast-content',
           error: 'toast-error',
           icon: 'toast-icon',
           info: 'toast-info',
           success: 'toast-success',
           title: 'toast-title',
-          toast: 'payload-toast-item',
+          toast: 'ecolitea-toast-item',
           warning: 'toast-warning',
         },
         unstyled: true,

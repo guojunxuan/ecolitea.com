@@ -35,9 +35,6 @@ export const CallToAction: Block = {
           },
         },
         linkGroup({
-          additions: {
-            npmCta: true,
-          },
           appearances: false,
           overrides: {
             admin: {

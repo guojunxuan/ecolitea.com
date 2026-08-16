@@ -8,7 +8,6 @@ import { BackgroundScanline } from '@components/BackgroundScanline/index'
 import { BlockWrapper } from '@components/BlockWrapper/index'
 import { CMSLink } from '@components/CMSLink/index'
 import { CommandLine } from '@components/CommandLine'
-import CreatePayloadApp from '@components/CreatePayloadApp/index'
 import { Gutter } from '@components/Gutter/index'
 import { Media } from '@components/Media/index'
 import { RichText } from '@components/RichText/index'
@@ -78,21 +77,7 @@ export const CallToAction: React.FC<CallToActionProps> = (props) => {
 
                 {hasLinks && (
                   <div className={[classes.links, 'cols-16 cols-m-8'].filter(Boolean).join(' ')}>
-                    {links.map(({ type: ctaType, link, npmCta }, index) => {
-                      const type = ctaType ?? 'link'
-
-                      if (type === 'npmCta') {
-                        return (
-                          <CreatePayloadApp
-                            background={false}
-                            className={classes.npmCta}
-                            key={index}
-                            label={npmCta?.label}
-                            style="cta"
-                          />
-                        )
-                      }
-
+                    {links.map(({ link }, index) => {
                       return (
                         <CMSLink
                           {...link}

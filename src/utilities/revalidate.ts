@@ -6,10 +6,10 @@ import type { Payload } from 'payload'
 
 export const revalidate = async (args: {
   collection: string
-  payload: Payload
+  ecoliteaCMS: Payload
   slug: string
 }): Promise<void> => {
-  const { slug, collection, payload } = args
+  const { slug, collection, ecoliteaCMS } = args
 
   try {
     const res = await fetch(
@@ -17,14 +17,14 @@ export const revalidate = async (args: {
     )
 
     if (res.ok) {
-      payload.logger.info(`Revalidated page '${slug}' in collection '${collection}'`)
+      ecoliteaCMS.logger.info(`Revalidated page '${slug}' in collection '${collection}'`)
     } else {
-      payload.logger.error(
+      ecoliteaCMS.logger.error(
         `Error revalidating page '${slug}' in collection '${collection}': ${res}`,
       )
     }
   } catch (err: unknown) {
-    payload.logger.error(
+    ecoliteaCMS.logger.error(
       `Error hitting revalidate route for page '${slug}' in collection '${collection}': ${err}`,
     )
   }

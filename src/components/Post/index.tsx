@@ -2,7 +2,6 @@ import type { Post as PostType } from '@root/payload-types'
 
 import { BackgroundGrid } from '@components/BackgroundGrid/index'
 import { Breadcrumbs } from '@components/Breadcrumbs/index'
-import { DiscordGitCTA } from '@components/DiscordGitCTA/index'
 import { Gutter } from '@components/Gutter/index'
 import { Media } from '@components/Media/index'
 import { RenderBlocks } from '@components/RenderBlocks/index'
@@ -43,9 +42,6 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
               ) : (
                 <GuestAuthorList author={guestAuthor} socials={guestSocials} />
               )}
-              <div className={classes.discordGitWrap}>
-                <DiscordGitCTA appearance="minimal" />
-              </div>
             </div>
           </div>
 

@@ -9,7 +9,6 @@ import { BlockWrapper } from '@components/BlockWrapper/index'
 import { Button } from '@components/Button'
 import { ChangeHeaderTheme } from '@components/ChangeHeaderTheme/index'
 import { CMSLink } from '@components/CMSLink/index'
-import { CommandLine } from '@components/CommandLine'
 import { Gutter } from '@components/Gutter/index'
 import { LogoShowcase } from '@components/Hero/HomeNew/LogoShowcase/index'
 import { Media } from '@components/Media/index'
@@ -56,27 +55,19 @@ export const HomeNewHero: React.FC<
             {Array.isArray(primaryButtons) && (
               <ul className={classes.primaryButtons}>
                 {primaryButtons.map((button, i) => {
-                  if (button.type === 'link') {
-                    return (
-                      <li key={i}>
-                        <CMSLink
-                          {...button.link}
-                          appearance="default"
-                          buttonProps={{
-                            hideHorizontalBorders: true,
-                            icon: 'arrow',
-                          }}
-                          fullWidth
-                        />
-                      </li>
-                    )
-                  } else if (button.type === 'npmCta' && button.npmCta?.label) {
-                    return (
-                      <li className={classes.command} key={i}>
-                        <CommandLine command={button.npmCta?.label} inLinkGroup />
-                      </li>
-                    )
-                  }
+                  return (
+                    <li key={i}>
+                      <CMSLink
+                        {...button.link}
+                        appearance="default"
+                        buttonProps={{
+                          hideHorizontalBorders: true,
+                          icon: 'arrow',
+                        }}
+                        fullWidth
+                      />
+                    </li>
+                  )
                 })}
               </ul>
             )}

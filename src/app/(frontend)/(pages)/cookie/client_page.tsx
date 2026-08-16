@@ -36,13 +36,13 @@ export const CookieClientPage: React.FC = () => {
             <h2>Cookie Policy</h2>
             <p>Effective as of March 28, 2024.</p>
             <p>
-              This cookie policy explains how Payload CMS, Inc. and our subsidiaries and affiliates
-              ("<b>Payload</b>," "<b>we</b>", “<b>us</b>” or "<b>our</b>") use cookies to help
+              This cookie policy explains how Ecolitea and our subsidiaries and affiliates ("
+              <b>Ecolitea</b>," "<b>we</b>", “<b>us</b>” or "<b>our</b>") use cookies to help
               improve your experience of our website at{' '}
-              <a href="https://payloadcms.com/">https://payloadcms.com</a> and any other website
-              that we own or control and which posts or links to this cookie policy (collectively,
-              the “Sites”). This cookie policy complements Payload’s privacy policy. It covers the
-              use of cookies between your device and our Sites.
+              <a href="https://ecolitea.com/">https://ecolitea.com</a> and any other website that we
+              own or control and which posts or links to this cookie policy (collectively, the
+              “Sites”). This cookie policy complements Ecolitea’s privacy policy. It covers the use
+              of cookies between your device and our Sites.
             </p>
             <p>
               We also provide basic information on third-party services we may use, who may also use
@@ -367,8 +367,8 @@ export const CookieClientPage: React.FC = () => {
             </p>
             <h4>Questions</h4>
             <p>
-              If you have any questions about this cookie policy, please contact us by email at
-              <a href="mailto:info@payloadcms.com">info@payloadcms.com</a>.
+              If you have any questions about this cookie policy, please contact us by email at the
+              contact details published on this website once confirmed.
             </p>
           </div>
           <div className="cols-16 cols-m-8">
