@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 
 import BreadcrumbsBar from '@components/Hero/BreadcrumbsBar/index'
-import { PayloadRedirects } from '@components/PayloadRedirects/index'
+import { EcoliteaRedirects } from '@components/EcoliteaRedirects/index'
 import { Post } from '@components/Post/index'
 import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave/index'
 import { fetchBlogPost, fetchPosts } from '@data'
+import { brandMetadata } from '@root/seo/brandMetadata'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { canonicalURL, indexFollowRobots, noIndexFollowRobots } from '@root/seo/metadata'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
@@ -31,12 +33,12 @@ const PostPage = async ({
   const url = `/${category}/${slug}`
 
   if (!blogPost) {
-    return <PayloadRedirects url={url} />
+    return <EcoliteaRedirects url={url} />
   }
 
   return (
     <>
-      <PayloadRedirects disableNotFound url={url} />
+      <EcoliteaRedirects disableNotFound url={url} />
       <RefreshRouteOnSave />
       <BreadcrumbsBar breadcrumbs={[]} hero={{ type: 'default' }} />
       <Post {...blogPost} />
@@ -75,6 +77,8 @@ export async function generateMetadata({
   const { isEnabled: draft } = await draftMode()
   const { slug, category } = await params
   const post = await getPost(slug, category, draft)
+  const path = `/posts/${category}/${slug}`
+  const description = post?.meta?.description || brandMetadata.description
 
   let ogImage: null | string = null
 
@@ -94,9 +98,20 @@ export async function generateMetadata({
   }
 
   return {
-    description: post?.meta?.description,
+    alternates: {
+      canonical: canonicalURL(path, post?.canonical),
+    },
+    description,
     openGraph: mergeOpenGraph({
-      description: post?.meta?.description ?? undefined,
+      authors:
+        post?.authorType === 'guest'
+          ? post.guestAuthor
+            ? [post.guestAuthor]
+            : undefined
+          : post?.authors
+              ?.filter((author) => typeof author !== 'string')
+              .map((author) => `${author.firstName} ${author.lastName}`),
+      description,
       images: ogImage
         ? [
             {
@@ -104,9 +119,13 @@ export async function generateMetadata({
             },
           ]
         : undefined,
-      title: post?.meta?.title ?? undefined,
-      url: `/${category}/${slug}`,
+      modifiedTime: post?.updatedAt,
+      publishedTime: post?.publishedOn,
+      title: post?.meta?.title ?? post?.title ?? undefined,
+      type: 'article',
+      url: canonicalURL(path, post?.canonical),
     }),
+    robots: post?.noindex ? noIndexFollowRobots : indexFollowRobots,
     title: post?.meta?.title ?? post?.title ?? undefined,
   }
 }

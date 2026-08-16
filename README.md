@@ -7,19 +7,17 @@ Ecolitea is a CMS-driven website built on a tailored Payload implementation. Its
 - **Content management** — Create and maintain pages, posts, categories, case studies, reusable content, and flexible page blocks.
 - **Media management** — Upload media, generate configured image sizes, and deliver public assets through Cloudflare R2.
 - **Site configuration** — Manage the main navigation, footer, top bar, and conversion settings without changing application code.
-- **Growth operations** — Receive form submissions and email notifications; configure SEO, redirects, analytics, and operational counters.
+- **Growth operations** — Receive form submissions and optionally enable email notifications; configure SEO, redirects, consent-gated analytics, and operational counters.
 - **Administration** — Maintain administrator users and access to the content-management workspace.
 
-## Current Branch: Site Navigation Redesign
+## System Scope
 
-The `chore/site-navigation-redesign` branch streamlines the original Payload website into the Ecolitea site and delivers the following system changes:
-
-- **Focused application scope** — Removes the inherited Payload Cloud account, billing, deployment, and documentation experiences so the repository serves the Ecolitea website and CMS.
-- **CMS-driven navigation** — Provides a responsive desktop navigation system and a mobile menu with three-level drill-down navigation, parent links, back navigation, and accessible controls.
-- **CMS-driven footer** — Lets editors manage the brand description, navigation columns, contact details, social links, newsletter content, legal links, and copyright text.
-- **Unified Ecolitea identity** — Uses the Ecolitea vector lockup consistently in desktop navigation, mobile navigation, and the footer with accessible homepage links.
-- **Responsive presentation** — Defines desktop and mobile typography, spacing, wrapping, touch targets, and navigation/footer layout behavior.
-- **Schema rollout and regression coverage** — Includes the footer brand-description migration, generated Payload types, and automated tests for navigation, footer content, layout, icons, links, schema, and branding.
+- **Public website** — Serves Ecolitea pages, posts, categories, case studies, forms, reusable content, redirects, legal pages, and media-driven page blocks.
+- **Search metadata** — Uses `https://ecolitea.com` as the canonical production origin, English as the default language, and `%s | Ecolitea` as the page-title template. The homepage title is `LED Lighting & Illuminated Mirror Solutions | Ecolitea`.
+- **Administration** — Provides the Payload-based Ecolitea Admin workspace at `/admin`, with Ecolitea branding for the sign-in logo and browser title.
+- **Privacy and tracking** — Requires global cookie consent before GA/GTM analytics scripts or events may load. GA, GTM, and outbound email remain inactive until configured. Meta Pixel, advertising, remarketing, the Analytics Dashboard, and its data APIs are not enabled.
+- **Origins and development access** — Allows the Ecolitea production origins and local development origins. Development auto-login is disabled.
+- **Storage compatibility** — Retains Payload collection slugs, global slugs, block types, field names, generated types, and MongoDB collection identifiers so existing documents and relationships remain compatible.
 
 ## Production Architecture
 
@@ -61,7 +59,6 @@ cd ecolitea
 corepack enable
 corepack pnpm@9.15.4 install --frozen-lockfile
 cp .env.example .env
-corepack pnpm@9.15.4 payload migrate
 corepack pnpm@9.15.4 dev
 ```
 
@@ -70,11 +67,21 @@ Open `http://localhost:3000/admin` to sign in to the admin panel. The website is
 ### Validate a local change
 
 ```bash
-corepack pnpm@9.15.4 exec tsc --noEmit --incremental false
+corepack pnpm@9.15.4 exec tsc --noEmit
+corepack pnpm@9.15.4 exec tsx --test \
+  test/admin-branding.test.ts \
+  test/brand-metadata.test.ts \
+  test/integration-config.test.ts \
+  test/legal-branding.test.ts \
+  test/legacy-feature-cleanup.test.ts \
+  test/og-branding.test.ts \
+  test/seo-fields.test.ts \
+  test/seo-metadata.test.ts \
+  test/seo-routing.test.ts
 corepack pnpm@9.15.4 build:skipDocs
 ```
 
-Local development uses the generic `DATABASE_URI` in `.env`. Use `payload migrate` only when a release intentionally introduces a database schema change. `build:skipDocs` is the production build used by this streamlined Ecolitea installation.
+Local development uses the generic `DATABASE_URI` in `.env`. Use `payload migrate` only when a release intentionally introduces a database schema change. `build:skipDocs` is the production build command for this Ecolitea installation.
 
 ### Validate a development branch in GitHub Actions
 
@@ -84,8 +91,6 @@ Development branches do not need a Git tag. Push the branch to GitHub, then open
 2. Select **Run workflow**.
 
 The CI workflow checks out the selected branch, installs the locked dependencies, runs the complete automated test suite, type-checks the project, and runs the production build against a disposable CI MongoDB service. It has read-only repository permissions and cannot create a Git tag, container image, package, GitHub Release, or production database change. Keep the workflow on the development branch until these checks pass, then open the pull request to `main`.
-
-While this `ci.yml` is not yet available from the default branch, run **Actions → Release Ecolitea → Run workflow** on the development branch and leave the optional `version` field empty. The same validation runs, and the publishing job is marked as skipped.
 
 ## Environment Configuration
 
@@ -98,7 +103,7 @@ Keep environment values in `.env` locally and on the server. Use placeholders ra
 | Docker database               | `MONGODB_URI`, `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD`                                                                                                                  | The production application connection string and MongoDB's first-run root-user initialization values.                              |
 | Docker deployment             | `DOMAIN`, `ECOLITEA_IMAGE`, `IMAGE_TAG`                                                                                                                                                    | The public host name, GHCR image reference, and selected immutable release image tag.                                              |
 | Media storage                 | `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`, `R2_PUBLIC_URL`                                                                                                    | Cloudflare R2 bucket access and the public media origin.                                                                           |
-| Optional email and analytics  | `SENDGRID_API_KEY`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_MEASUREMENT_ID`, `NEXT_PUBLIC_FACEBOOK_PIXEL_ID`, `GA_USE_DEMO_DATA`                                                 | Optional email notifications and analytics integrations. Set `GA_USE_DEMO_DATA=false` in production.                               |
+| Optional email and analytics  | `SENDGRID_API_KEY`, `EMAIL_FROM_NAME`, `EMAIL_FROM_ADDRESS`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_GTM_MEASUREMENT_ID`, `GA_USE_DEMO_DATA`                                          | Currently unconfigured. Email requires a provider key and confirmed sender address. GA/GTM scripts and events require consent.      |
 | Optional forms and publishing | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `NEXT_PRIVATE_RECAPTCHA_SECRET_KEY`, `NEXT_PRIVATE_HUBSPOT_PORTAL_KEY`, `NEXT_PRIVATE_DRAFT_SECRET`, `REVALIDATION_KEY`, `NEXT_PRIVATE_REVALIDATION_KEY` | Optional reCAPTCHA and form integrations, draft access, and controlled content revalidation.                                       |
 
 For a Docker deployment, set `MONGODB_URI` to an authenticated internal connection string. It is passed to the application as `DATABASE_URI`:
@@ -126,6 +131,11 @@ NEXT_PRIVATE_REVALIDATION_KEY=REPLACE_WITH_A_RANDOM_SECRET
 REVALIDATION_KEY=REPLACE_WITH_A_RANDOM_SECRET
 GA_USE_DEMO_DATA=false
 
+# Optional outbound email (leave empty until the sender is confirmed)
+SENDGRID_API_KEY=
+EMAIL_FROM_NAME=Ecolitea
+EMAIL_FROM_ADDRESS=
+
 # Docker deployment
 DOMAIN=YOUR_DOMAIN
 ECOLITEA_IMAGE=ghcr.io/GHCR_OWNER/ecolitea
@@ -145,7 +155,7 @@ R2_ENDPOINT=https://YOUR_CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
 R2_PUBLIC_URL=https://media.YOUR_DOMAIN
 ```
 
-Email, analytics, and reCAPTCHA are optional integrations. When one is enabled, provide its public `NEXT_PUBLIC_*` integration value as an optional GitHub Actions Variable before the image build; Next.js bakes those public values into the image. Keep server-only integration keys, including `SENDGRID_API_KEY`, `NEXT_PRIVATE_RECAPTCHA_SECRET_KEY`, and `NEXT_PRIVATE_HUBSPOT_PORTAL_KEY`, only in the server `.env`.
+Email, analytics, and reCAPTCHA are optional integrations and remain disabled until their required configuration values are supplied. When one is enabled, provide its public `NEXT_PUBLIC_*` integration value as an optional GitHub Actions Variable before the image build; Next.js bakes those public values into the image. Keep server-only integration keys, including `SENDGRID_API_KEY`, `NEXT_PRIVATE_RECAPTCHA_SECRET_KEY`, and `NEXT_PRIVATE_HUBSPOT_PORTAL_KEY`, only in the server `.env`. Enabling Google Ads, Meta Ads, remarketing, or another advertising tracker also requires updating the cookie banner, consent categories, Cookie Policy, and Privacy Policy before deployment.
 
 Generate `PAYLOAD_SECRET` with a cryptographically secure value of at least 32 characters, for example:
 

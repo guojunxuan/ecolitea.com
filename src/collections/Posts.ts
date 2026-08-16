@@ -6,6 +6,7 @@ import { isAdmin } from '../access/isAdmin'
 import { publishedOnly } from '../access/publishedOnly'
 import { Banner } from '../blocks/Banner'
 import richText from '../fields/richText'
+import { seoOverrideFields } from '../fields/seoOverrides'
 import { slugField } from '../fields/slug'
 import { formatPreviewURL } from '../utilities/formatPreviewURL'
 
@@ -128,7 +129,8 @@ export const Posts: CollectionConfig = {
       name: 'thumbnail',
       type: 'upload',
       admin: {
-        condition: (_, siblingData) => !siblingData?.dynamicThumbnail && siblingData?.featuredMedia !== 'upload',
+        condition: (_, siblingData) =>
+          !siblingData?.dynamicThumbnail && siblingData?.featuredMedia !== 'upload',
       },
       relationTo: 'media',
       required: true,
@@ -200,7 +202,14 @@ export const Posts: CollectionConfig = {
     {
       name: 'content',
       type: 'blocks',
-      blockReferences: [Banner, 'blogContent', 'code', 'blogMarkdown', 'mediaBlock', 'reusableContentBlock'],
+      blockReferences: [
+        Banner,
+        'blogContent',
+        'code',
+        'blogMarkdown',
+        'mediaBlock',
+        'reusableContentBlock',
+      ],
       blocks: [],
       required: true,
     },
@@ -218,6 +227,7 @@ export const Posts: CollectionConfig = {
       relationTo: 'posts',
     },
     slugField(),
+    ...seoOverrideFields,
     {
       name: 'authorType',
       type: 'select',

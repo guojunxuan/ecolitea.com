@@ -14,7 +14,7 @@ export const GoogleAnalytics: React.FC = () => {
   const { cookieConsent } = usePrivacy()
 
   React.useEffect(() => {
-    if (!gaMeasurementID || !window?.location?.href) {
+    if (!cookieConsent || !gaMeasurementID || !window?.location?.href) {
       return
     }
 
@@ -23,7 +23,7 @@ export const GoogleAnalytics: React.FC = () => {
       page_path: pathname,
       page_title: document.title,
     })
-  }, [pathname])
+  }, [cookieConsent, pathname])
 
   if (!cookieConsent || !gaMeasurementID) {
     return null

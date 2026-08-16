@@ -1,5 +1,8 @@
 import { Archive } from '@components/Archive'
 import { fetchArchive, fetchArchives } from '@data'
+import { brandMetadata } from '@root/seo/brandMetadata'
+import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { canonicalURL, indexFollowRobots, noIndexFollowRobots } from '@root/seo/metadata'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
@@ -43,9 +46,22 @@ export const generateMetadata = async ({ params }: { params: Promise<{ category:
   }
 
   const { name, description } = archive
+  const hasPublishedPosts = Boolean(archive.posts?.docs?.length)
+  const path = `/posts/${category}`
+
+  const resolvedDescription = description || brandMetadata.description
 
   return {
-    description,
-    title: `${name} | Payload`,
+    alternates: {
+      canonical: canonicalURL(path),
+    },
+    description: resolvedDescription,
+    openGraph: mergeOpenGraph({
+      description: resolvedDescription,
+      title: name,
+      url: canonicalURL(path),
+    }),
+    robots: hasPublishedPosts ? indexFollowRobots : noIndexFollowRobots,
+    title: name,
   }
 }

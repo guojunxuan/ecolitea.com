@@ -7,9 +7,9 @@ import { getPayload } from 'payload'
 type Collection = keyof Config['collections']
 
 async function getDocument(collection: Collection, slug: string, depth = 0) {
-  const payload = await getPayload({ config: configPromise })
+  const ecoliteaCMS = await getPayload({ config: configPromise })
 
-  const page = await payload.find({
+  const page = await ecoliteaCMS.find({
     collection,
     depth,
     where: {

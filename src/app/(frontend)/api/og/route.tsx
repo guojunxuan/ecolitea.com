@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 
+import { brandMetadata } from '@root/seo/brandMetadata'
 import { ImageResponse } from 'next/og'
 import { NextResponse } from 'next/server'
 
@@ -23,7 +24,9 @@ export async function GET(req: NextRequest): Promise<ImageResponse> {
     const { searchParams: earlyParams } = new URL(req.url)
     const isReleases = earlyParams.get('type') === 'releases'
 
-    const faviconDataUrl = await fetch(new URL('../../../../../public/images/favicon-light.png', import.meta.url))
+    const faviconDataUrl = await fetch(
+      new URL('../../../../../public/images/favicon-light.png', import.meta.url),
+    )
       .then((res) => res.arrayBuffer())
       .then((buf) => `data:image/png;base64,${Buffer.from(buf).toString('base64')}`)
 
@@ -202,7 +205,7 @@ export async function GET(req: NextRequest): Promise<ImageResponse> {
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt="Payload CMS" height="40" src={faviconDataUrl} width="40" />
+              <img alt={brandMetadata.name} height="40" src={faviconDataUrl} width="40" />
               {ogType !== 'releases' && (
                 <div
                   style={{

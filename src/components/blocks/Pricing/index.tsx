@@ -6,7 +6,6 @@ import { BackgroundScanline } from '@components/BackgroundScanline/index'
 import { BlockWrapper } from '@components/BlockWrapper/index'
 import { PricingCard } from '@components/cards/PricingCard/index'
 import { CMSLink } from '@components/CMSLink/index'
-import CreatePayloadApp from '@components/CreatePayloadApp/index'
 import { Gutter } from '@components/Gutter/index'
 import { Collapsible, CollapsibleContent, CollapsibleToggler } from '@faceless-ui/collapsibles'
 import { ChevronIcon } from '@root/graphics/ChevronIcon/index'
@@ -67,17 +66,7 @@ export const Pricing: React.FC<Props> = ({ hideBackground, padding, pricingField
         {hasPlans && (
           <div className={[classes.wrapper, 'grid'].filter(Boolean).join(' ')}>
             {plans.map((plan, i) => {
-              const {
-                name,
-                description,
-                enableCreatePayload,
-                enableLink,
-                features,
-                hasPrice,
-                link,
-                price,
-                title,
-              } = plan
+              const { name, description, enableLink, features, hasPrice, link, price, title } = plan
               const isToggled = toggledPlan === name
               const isLast = i + 1 === plans.length
 
@@ -124,7 +113,7 @@ export const Pricing: React.FC<Props> = ({ hideBackground, padding, pricingField
                     </Collapsible>
                   </div>
 
-                  {(enableLink || enableCreatePayload) && (
+                  {enableLink && (
                     <div className={classes.ctaWrapper}>
                       {enableLink && (
                         <CMSLink
@@ -135,10 +124,6 @@ export const Pricing: React.FC<Props> = ({ hideBackground, padding, pricingField
                             hideBorders: true,
                           }}
                         />
-                      )}
-
-                      {enableCreatePayload && (
-                        <CreatePayloadApp background={false} className={classes.createPayloadApp} />
                       )}
                     </div>
                   )}

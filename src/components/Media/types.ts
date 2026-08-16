@@ -13,7 +13,7 @@ export interface Props {
   onLoad?: () => void
   priority?: boolean // for NextImage only
   ref?: Ref<HTMLImageElement | HTMLVideoElement | null>
-  resource?: TypedUploadCollection[UploadCollectionSlug] // for Payload media
+  resource?: TypedUploadCollection[UploadCollectionSlug] // for Ecolitea CMS media
   sizes?: string // for NextImage only
   src?: null | StaticImageData | string // for static media
   videoClassName?: string

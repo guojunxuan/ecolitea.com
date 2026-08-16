@@ -1,4 +1,4 @@
-const payload = require('payload')
+const ecoliteaCMS = require('payload')
 const path = require('path')
 
 // eslint-disable-next-line
@@ -11,16 +11,16 @@ const { MONGODB_URI, PAYLOAD_SECRET } = process.env
 process.env.PAYLOAD_CONFIG_PATH = 'dist/payload.config.js'
 
 const migrateStatus = async () => {
-  // Initialize Payload
+  // Initialize the Ecolitea CMS
   // IMPORTANT: make sure your ENV variables are filled properly here
   // as the below variable names are just for reference.
-  await payload.init({
+  await ecoliteaCMS.init({
     secret: PAYLOAD_SECRET,
     mongoURL: MONGODB_URI,
     local: true,
   })
 
-  const docs = await payload.find({
+  const docs = await ecoliteaCMS.find({
     collection: 'posts',
     depth: 0,
     limit: 700,
@@ -40,7 +40,7 @@ const migrateStatus = async () => {
       }
 
       try {
-        await payload.update({
+        await ecoliteaCMS.update({
           collection: 'posts',
           id: doc.id,
           data: {
@@ -50,14 +50,18 @@ const migrateStatus = async () => {
           },
         })
 
-        payload.logger.info(`Success! Post with slug: '${doc.slug}' successfully migrated authors.`)
+        ecoliteaCMS.logger.info(
+          `Success! Post with slug: '${doc.slug}' successfully migrated authors.`,
+        )
       } catch (err) {
-        payload.logger.error(`Failed. Post with slug: '${doc.slug}' failed to migrate authors.`)
+        ecoliteaCMS.logger.error(
+          `Failed. Post with slug: '${doc.slug}' failed to migrate authors.`,
+        )
       }
     }),
   )
 
-  payload.logger.info('Complete')
+  ecoliteaCMS.logger.info('Complete')
   process.exit(0)
 }
 

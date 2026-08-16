@@ -53,7 +53,7 @@ export const ComparisonTable: Block = {
                   name: 'columnOneHeader',
                   type: 'text',
                   admin: {
-                    placeholder: 'Payload',
+                    placeholder: 'Ecolitea',
                     width: '30%',
                   },
                   label: 'Column One Header',

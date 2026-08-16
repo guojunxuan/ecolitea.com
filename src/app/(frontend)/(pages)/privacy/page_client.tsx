@@ -16,12 +16,12 @@ export const PrivacyClientPage: React.FC = () => {
             <h2>Privacy Policy</h2>
             <p>Effective as of March 28, 2024.</p>
             <p>
-              This Privacy Policy describes how Payload CMS, Inc. ("<b>Payload</b>," "<b>we</b>", “
-              <b>us</b>” or "<b>our</b>") processes personal information that we collect through our
-              digital or online properties or services that link to this Privacy Policy (including
-              as applicable, our website, mobile application, social media pages, marketing
-              activities, live events and other activities described in this Privacy Policy
-              (collectively, the “<b>Service</b>”)).
+              This Privacy Policy describes how Ecolitea ("<b>Ecolitea</b>," "<b>we</b>", “<b>us</b>
+              ” or "<b>our</b>") processes personal information that we collect through our digital
+              or online properties or services that link to this Privacy Policy (including as
+              applicable, our website, mobile application, social media pages, marketing activities,
+              live events and other activities described in this Privacy Policy (collectively, the “
+              <b>Service</b>”)).
             </p>
             <p>
               Our websites, products and services are designed for enterprise customers and their
@@ -348,11 +348,11 @@ export const PrivacyClientPage: React.FC = () => {
             </p>
             <p>
               <b>Business transferees</b>. We may disclose personal information in the context of
-              actual or prospective business transactions (e.g., investments in Payload, financing
-              of Payload, public stock offerings or the sale, transfer or merger of all or part of
+              actual or prospective business transactions (e.g., investments in Ecolitea, financing
+              of Ecolitea, public stock offerings or the sale, transfer or merger of all or part of
               our business, assets or shares), for example, we may need to share certain personal
               information with prospective counterparties and their advisers. We may also disclose
-              your personal information to an acquirer, successor or assignee of Payload as part of
+              your personal information to an acquirer, successor or assignee of Ecolitea as part of
               any merger, acquisition, sale of assets, or similar transaction and/or in the event of
               an insolvency, bankruptcy or receivership in which personal information is transferred
               to one or more third parties as one of our business assets.
@@ -528,7 +528,7 @@ export const PrivacyClientPage: React.FC = () => {
             <h3 id="contactUs">How to contact us</h3>
             <ul>
               <li>
-                <b>Email</b>: legal@payloadcms.com
+                <b>Email</b>: To be confirmed
               </li>
               <li>
                 <b>Mail</b>: 624 Stocking NW. Grand Rapids, MI 49504
@@ -549,9 +549,9 @@ export const PrivacyClientPage: React.FC = () => {
               identified or can be identified.{' '}
             </p>
             <p>
-              <b>Controller</b>. Payload CMS, Inc. (“<b>Payload</b>”) is the controller in respect
-              of the processing of your personal information covered by this Privacy Policy for
-              purposes of European data protection legislation (i.e., the{' '}
+              <b>Controller</b>. Ecolitea (“<b>Ecolitea</b>”) is the controller in respect of the
+              processing of your personal information covered by this Privacy Policy for purposes of
+              European data protection legislation (i.e., the{' '}
               <a
                 href="https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679&from=EN"
                 target="_blank"
@@ -571,9 +571,9 @@ export const PrivacyClientPage: React.FC = () => {
             <h5>General Data Protection Regulation (GDPR)</h5>
             <p>
               <b>European Representative</b>. Pursuant to Article 27 of the General Data Protection
-              Regulation (GDPR), Payload CMS, Inc. has appointed European Data Protection Office
-              (EDPO) as its GDPR Representative in the EU. You can contact EDPO regarding matters
-              pertaining to the GDPR:
+              Regulation (GDPR), Ecolitea has appointed European Data Protection Office (EDPO) as
+              its GDPR Representative in the EU. You can contact EDPO regarding matters pertaining
+              to the GDPR:
               <ul>
                 <li>
                   by using EDPO’s online request form:{' '}
@@ -586,7 +586,7 @@ export const PrivacyClientPage: React.FC = () => {
             </p>
             <h5>UK General Data Protection Regulation (GDPR)</h5>
             <p>
-              <b>UK Representative</b>. Pursuant to Article 27 of the UK GDPR, Payload CMS, Inc. has
+              <b>UK Representative</b>. Pursuant to Article 27 of the UK GDPR, Ecolitea has
               appointed EDPO UK Ltd as its UK GDPR representative in the UK. You can contact EDPO UK
               regarding matters pertaining to the UK GDPR:
               <ul>
@@ -860,13 +860,14 @@ export const PrivacyClientPage: React.FC = () => {
               </li>
             </ul>
             <p>
-              <b>Exercising These Rights</b>. You may submit these requests by email to
-              [legal@payloadcms.com] or our postal address provided above. We may request specific
-              information from you to help us confirm your identity and process your request.
-              Whether or not we are required to fulfill any request you make will depend on a number
-              of factors (e.g., why and how we are processing your personal information), if we
-              reject any request you may make (whether in whole or in part) we will let you know our
-              grounds for doing so at the time, subject to any legal restrictions.
+              <b>Exercising These Rights</b>. You may submit these requests using the privacy
+              contact details published on this website once confirmed or our postal address
+              provided above. We may request specific information from you to help us confirm your
+              identity and process your request. Whether or not we are required to fulfill any
+              request you make will depend on a number of factors (e.g., why and how we are
+              processing your personal information), if we reject any request you may make (whether
+              in whole or in part) we will let you know our grounds for doing so at the time,
+              subject to any legal restrictions.
             </p>
             <p>
               <b>Your Right to Lodge a Complaint with your Supervisory Authority</b>. In addition to

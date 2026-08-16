@@ -23,10 +23,6 @@ export const Pricing: Block = {
               type: 'checkbox',
             },
             {
-              name: 'enableCreatePayload',
-              type: 'checkbox',
-            },
-            {
               name: 'price',
               type: 'text',
               admin: {

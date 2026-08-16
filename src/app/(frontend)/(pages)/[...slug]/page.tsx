@@ -2,11 +2,18 @@ import type { Media } from '@root/payload-types'
 import type { Metadata } from 'next'
 
 import { Hero } from '@components/Hero/index'
-import { PayloadRedirects } from '@components/PayloadRedirects'
+import { EcoliteaRedirects } from '@components/EcoliteaRedirects'
 import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave'
 import { RenderBlocks } from '@components/RenderBlocks/index'
 import { fetchPage, fetchPages } from '@data'
+import { brandMetadata } from '@root/seo/brandMetadata'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import {
+  canonicalURL,
+  indexFollowRobots,
+  noIndexFollowRobots,
+  resolvePageTitle,
+} from '@root/seo/metadata'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
@@ -28,12 +35,12 @@ const Page = async ({
   const page = await getPage(slug, draft)
 
   if (!page) {
-    return <PayloadRedirects url={url} />
+    return <EcoliteaRedirects url={url} />
   }
 
   return (
     <React.Fragment>
-      <PayloadRedirects disableNotFound url={url} />
+      <EcoliteaRedirects disableNotFound url={url} />
       <RefreshRouteOnSave />
       <Hero firstContentBlock={page.layout[0]} page={page} />
       <RenderBlocks blocks={page.layout} hero={page.hero} />
@@ -62,6 +69,14 @@ export async function generateMetadata({
   const { slug } = await params
   const { isEnabled: draft } = await draftMode()
   const page = await getPage(slug, draft)
+  const slugSegments = Array.isArray(slug) ? slug : slug ? [slug] : []
+  const isHomepage = slugSegments.length === 0
+  const pagePath = isHomepage ? '/' : `/${slugSegments.join('/')}`
+  const resolvedTitle = resolvePageTitle({
+    isHomepage,
+    pageTitle: page?.title,
+    seoTitle: page?.meta?.title,
+  })
 
   let ogImage: Media | null = null
 
@@ -70,10 +85,13 @@ export async function generateMetadata({
   }
 
   // check if noIndex is true
-  const noIndexMeta = page?.noindex ? { robots: 'noindex' } : {}
+  const robots = page?.noindex ? noIndexFollowRobots : indexFollowRobots
 
   return {
-    description: page?.meta?.description,
+    alternates: {
+      canonical: canonicalURL(pagePath, page?.canonical),
+    },
+    description: page?.meta?.description || brandMetadata.description,
     openGraph: mergeOpenGraph({
       description: page?.meta?.description ?? undefined,
       images: ogImage
@@ -83,10 +101,10 @@ export async function generateMetadata({
             },
           ]
         : undefined,
-      title: page?.meta?.title || 'Payload',
-      url: Array.isArray(slug) ? slug.join('/') : '/',
+      title: isHomepage && !page?.meta?.title ? brandMetadata.openGraph.title : resolvedTitle,
+      url: canonicalURL(pagePath, page?.canonical),
     }),
-    title: page?.meta?.title || 'Payload',
-    ...noIndexMeta, // Add noindex meta tag if noindex is true
+    robots,
+    title: isHomepage ? { absolute: resolvedTitle } : resolvedTitle,
   }
 }

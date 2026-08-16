@@ -19,7 +19,7 @@ type UsePopulateDocumentOptions<T> = {
 }
 
 /**
- * Fetches a Payload document by ID from the REST API.
+ * Fetches an Ecolitea CMS document by ID from the REST API.
  * @returns The document data and loading state
  */
 export function usePopulateDocument<T>({

@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { isAdmin } from '../access/isAdmin'
 import { publishedOnly } from '../access/publishedOnly'
 import { fullTitle } from '../fields/fullTitle'
+import { seoOverrideFields } from '../fields/seoOverrides'
 import { hero } from '../fields/hero'
 import { slugField } from '../fields/slug'
 import { formatPreviewURL } from '../utilities/formatPreviewURL'
@@ -38,14 +39,7 @@ export const Pages: CollectionConfig = {
       required: true,
     },
     fullTitle,
-    {
-      name: 'noindex',
-      type: 'checkbox',
-      admin: {
-        position: 'sidebar',
-      },
-      label: 'No Index',
-    },
+    ...seoOverrideFields,
     {
       type: 'tabs',
       tabs: [

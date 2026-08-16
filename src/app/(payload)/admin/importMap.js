@@ -35,6 +35,7 @@ import { default as default_7855b44454994335ecfbd19f80d2bb90 } from '@root/globa
 import { default as default_7b4b356d4f495796f5ea32368107862c } from '@root/globals/CustomRowLabelTabs'
 import { BlogMarkdownField as BlogMarkdownField_a0e4da4b38919785352cf36efa721675 } from '@root/blocks/BlogMarkdown/Field'
 import { default as default_26726ff2b18133c6c2dab451ecac5a3e } from '@root/components/TableCheckboxField'
+import { default as default_e79b65c4c370cf37bd56b238331a509c } from '@root/components/AdminLogo'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
 
@@ -76,6 +77,7 @@ export const importMap = {
   "@root/globals/CustomRowLabelTabs#default": default_7b4b356d4f495796f5ea32368107862c,
   "@root/blocks/BlogMarkdown/Field#BlogMarkdownField": BlogMarkdownField_a0e4da4b38919785352cf36efa721675,
   "@root/components/TableCheckboxField#default": default_26726ff2b18133c6c2dab451ecac5a3e,
+  "@root/components/AdminLogo#default": default_e79b65c4c370cf37bd56b238331a509c,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
 }

@@ -4,7 +4,6 @@ import type { CaseStudy, ReusableContent } from '@root/payload-types'
 import { Gutter } from '@components/Gutter/index'
 import { RichText } from '@components/RichText/index'
 import { useMouseInfo } from '@faceless-ui/mouse-info'
-import { PayloadIcon } from '@graphics/PayloadIcon/index'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -43,12 +42,6 @@ export const CaseStudiesHighlightBlock: React.FC<Props> = ({
         <RichText className={classes.content} content={richText} />
       </Gutter>
       <div className={classes.wrap}>
-        <div className={classes.poweredByPayload}>
-          <div className={classes.poweredByPayloadInner}>
-            <PayloadIcon />
-            Powered by Payload
-          </div>
-        </div>
         <div
           className={classes.inner}
           style={{

@@ -3,9 +3,9 @@ import { migrateSlateToLexical } from '@payloadcms/richtext-lexical/migrate'
 import { getPayload } from 'payload'
 
 async function run() {
-  const payload = await getPayload({ config })
+  const ecoliteaCMS = await getPayload({ config })
 
-  await migrateSlateToLexical({ payload })
+  await migrateSlateToLexical({ payload: ecoliteaCMS })
   process.exit(0)
 }
 
